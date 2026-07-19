@@ -27,7 +27,6 @@
 
     onMount(async () => {
         data = await fetchJson(`/schedule?tournament=${tournament}&season=${season}`);
-        console.log($state.snapshot(data));
     });
 
     let filteredMatches = $derived.by(() => {

@@ -315,77 +315,6 @@ var async_mode_flag = false;
 /** True if we're not certain that we only have Svelte 5 code in the compilation */
 var legacy_mode_flag = false;
 //#endregion
-//#region node_modules/svelte/src/internal/shared/clone.js
-/** @import { Snapshot } from './types' */
-/**
-* In dev, we keep track of which properties could not be cloned. In prod
-* we don't bother, but we keep a dummy array around so that the
-* signature stays the same
-* @type {string[]}
-*/
-var empty = [];
-/**
-* @template T
-* @param {T} value
-* @param {boolean} [skip_warning]
-* @param {boolean} [no_tojson]
-* @returns {Snapshot<T>}
-*/
-function snapshot(value, skip_warning = false, no_tojson = false) {
-	return clone(value, /* @__PURE__ */ new Map(), "", empty, null, no_tojson);
-}
-/**
-* @template T
-* @param {T} value
-* @param {Map<T, Snapshot<T>>} cloned
-* @param {string} path
-* @param {string[]} paths
-* @param {null | T} [original] The original value, if `value` was produced from a `toJSON` call
-* @param {boolean} [no_tojson]
-* @returns {Snapshot<T>}
-*/
-function clone(value, cloned, path, paths, original = null, no_tojson = false) {
-	if (typeof value === "object" && value !== null) {
-		var unwrapped = cloned.get(value);
-		if (unwrapped !== void 0) return unwrapped;
-		if (value instanceof Map) return new Map(value);
-		if (value instanceof Set) return new Set(value);
-		if (is_array(value)) {
-			var copy = Array(value.length);
-			cloned.set(value, copy);
-			if (original !== null) cloned.set(original, copy);
-			for (var i = 0; i < value.length; i += 1) {
-				var element = value[i];
-				if (i in value) copy[i] = clone(element, cloned, path, paths, null, no_tojson);
-			}
-			return copy;
-		}
-		if (get_prototype_of(value) === object_prototype) {
-			/** @type {Snapshot<any>} */
-			copy = {};
-			cloned.set(value, copy);
-			if (original !== null) cloned.set(original, copy);
-			for (var key of Object.keys(value)) copy[key] = clone(value[key], cloned, path, paths, null, no_tojson);
-			return copy;
-		}
-		if (value instanceof Date) return structuredClone(value);
-		if (typeof value.toJSON === "function" && !no_tojson) return clone(
-			/** @type {T & { toJSON(): any } } */
-			value.toJSON(),
-			cloned,
-			path,
-			paths,
-			value
-		);
-	}
-	if (value instanceof EventTarget) return value;
-	try {
-		return structuredClone(value);
-	} catch (e) {
-		return value;
-	}
-}
-//#endregion
 //#region node_modules/svelte/src/internal/client/context.js
 /** @import { ComponentContext, DevStackEntry, Effect } from '#client' */
 /** @type {ComponentContext | null} */
@@ -5522,18 +5451,20 @@ var stick_l_default = "<svg width=\"89\" height=\"100\" viewBox=\"0 0 89 100\" f
 var stick_r_default = "<svg width=\"89\" height=\"100\" viewBox=\"0 0 89 100\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n<path d=\"M76.4713 100H82.3535C85.6071 100 88.2357 97.3714 88.2357 94.1178V70.5891C88.2357 67.3355 85.6071 64.7069 82.3535 64.7069H76.4713V100ZM11.3444 3.69751C10.1312 0.682882 6.71213 -0.787667 3.69751 0.425536C0.682884 1.63874 -0.787666 5.05776 0.425537 8.07239L32.7592 88.9158C35.443 95.6068 41.9318 100 49.1558 100H67.6664V64.7069H35.7738L11.3811 3.69751H11.3444Z\" fill=\"white\"/>\n</svg>\n";
 //#endregion
 //#region src/widgets/Player.svelte
-var root$4 = /* @__PURE__ */ from_html(`<div class="data svelte-1dqovpw"><p class="desc svelte-1dqovpw"> </p> <p class="value svelte-1dqovpw"> </p></div>`);
-var root_1$4 = /* @__PURE__ */ from_html(`<div class="stat svelte-1dqovpw"><p class="title svelte-1dqovpw"> </p> <!></div>`);
-var root_2$4 = /* @__PURE__ */ from_html(`<div class="stat svelte-1dqovpw"><p class="title svelte-1dqovpw">Koko ura</p> <!></div>`);
-var root_3$3 = /* @__PURE__ */ from_html(`<div><div class="image svelte-1dqovpw"><img class="player-image svelte-1dqovpw"/> <img class="team-logo svelte-1dqovpw" alt=""/> <div class="fade svelte-1dqovpw"></div></div> <section class="svelte-1dqovpw"><p class="name svelte-1dqovpw"> </p> <div class="details svelte-1dqovpw"><div class="info svelte-1dqovpw"><!> <div class="data svelte-1dqovpw"><p class="desc svelte-1dqovpw">Syntynyt</p> <p class="value svelte-1dqovpw"> </p></div></div> <div class="info svelte-1dqovpw"><!> <div class="data svelte-1dqovpw"><p class="desc svelte-1dqovpw">Syntymäpaikka</p> <p class="value svelte-1dqovpw"> </p></div></div> <div class="info svelte-1dqovpw"><!> <div class="data svelte-1dqovpw"><p class="desc svelte-1dqovpw">Kansalaisuus</p> <p class="value svelte-1dqovpw"> </p></div></div> <div class="info svelte-1dqovpw"><!> <div class="data svelte-1dqovpw"><p class="desc svelte-1dqovpw">Pituus</p> <p class="value svelte-1dqovpw"> </p></div></div> <div class="info svelte-1dqovpw"><!> <div class="data svelte-1dqovpw"><p class="desc svelte-1dqovpw">Paino</p> <p class="value svelte-1dqovpw"> </p></div></div> <div class="info svelte-1dqovpw"><!> <div class="data svelte-1dqovpw"><p class="desc svelte-1dqovpw">Pelipaikka</p> <p class="value svelte-1dqovpw"> </p></div></div> <div class="info svelte-1dqovpw"><!> <div class="data svelte-1dqovpw"><p class="desc svelte-1dqovpw">Kätisyys</p> <p class="value svelte-1dqovpw"> </p></div></div></div> <!> <!></section></div>`);
-var $$css$4 = {
+var root$5 = /* @__PURE__ */ from_html(`<div class="data svelte-1dqovpw"><p class="desc svelte-1dqovpw"> </p> <p class="value svelte-1dqovpw"> </p></div>`);
+var root_1$5 = /* @__PURE__ */ from_html(`<div class="stat svelte-1dqovpw"><p class="title svelte-1dqovpw"> </p> <!></div>`);
+var root_2$5 = /* @__PURE__ */ from_html(`<div class="stat svelte-1dqovpw"><p class="title svelte-1dqovpw">Koko ura</p> <!></div>`);
+var root_3$3 = /* @__PURE__ */ from_html(`<div class="image svelte-1dqovpw"><img class="player-image svelte-1dqovpw"/> <img class="team-logo svelte-1dqovpw" alt=""/> <div class="fade svelte-1dqovpw"></div></div> <section class="svelte-1dqovpw"><p class="name svelte-1dqovpw"> </p> <div class="details svelte-1dqovpw"><div class="info svelte-1dqovpw"><!> <div class="data svelte-1dqovpw"><p class="desc svelte-1dqovpw">Syntynyt</p> <p class="value svelte-1dqovpw"> </p></div></div> <div class="info svelte-1dqovpw"><!> <div class="data svelte-1dqovpw"><p class="desc svelte-1dqovpw">Syntymäpaikka</p> <p class="value svelte-1dqovpw"> </p></div></div> <div class="info svelte-1dqovpw"><!> <div class="data svelte-1dqovpw"><p class="desc svelte-1dqovpw">Kansalaisuus</p> <p class="value svelte-1dqovpw"> </p></div></div> <div class="info svelte-1dqovpw"><!> <div class="data svelte-1dqovpw"><p class="desc svelte-1dqovpw">Pituus</p> <p class="value svelte-1dqovpw"> </p></div></div> <div class="info svelte-1dqovpw"><!> <div class="data svelte-1dqovpw"><p class="desc svelte-1dqovpw">Paino</p> <p class="value svelte-1dqovpw"> </p></div></div> <div class="info svelte-1dqovpw"><!> <div class="data svelte-1dqovpw"><p class="desc svelte-1dqovpw">Pelipaikka</p> <p class="value svelte-1dqovpw"> </p></div></div> <div class="info svelte-1dqovpw"><!> <div class="data svelte-1dqovpw"><p class="desc svelte-1dqovpw">Kätisyys</p> <p class="value svelte-1dqovpw"> </p></div></div></div> <!> <!></section>`, 1);
+var root_4$3 = /* @__PURE__ */ from_html(`<p>playerId not set in widget params</p>`);
+var root_5$3 = /* @__PURE__ */ from_html(`<div><!></div>`);
+var $$css$5 = {
 	hash: "svelte-1dqovpw",
 	code: ".liiga.player.widget.svelte-1dqovpw {flex-direction:column;overflow:hidden;.image:where(.svelte-1dqovpw) {position:relative;.player-image:where(.svelte-1dqovpw) {width:340px;height:320px;object-fit:cover;object-position:center top;border-radius:3px;z-index:2;position:relative;display:block;}.team-logo:where(.svelte-1dqovpw) {position:absolute;left:50%;top:50%;transform:translate(-50%, -50%);z-index:1;opacity:0.8;}.fade:where(.svelte-1dqovpw) {height:70px;width:100%;background:linear-gradient(0deg, var(--liiga-bg) 20%, transparent 100%);z-index:3;position:absolute;bottom:0;}}section:where(.svelte-1dqovpw) {display:flex;flex-direction:column;gap:10px;width:100%;}.name:where(.svelte-1dqovpw) {font-size:24px;width:100%;text-align:center;}.details:where(.svelte-1dqovpw) {display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;max-width:360px;background-color:var(--liiga-foreground);padding:10px;border-radius:10px;box-sizing:border-box;.info:where(.svelte-1dqovpw) {display:flex;align-items:center;gap:5px;svg {width:20px;height:15px;}}}.stat:where(.svelte-1dqovpw) {display:grid;grid-template-columns:2fr repeat(5, 0.8fr);align-items:center;gap:20px;background-color:var(--liiga-foreground);padding:5px 10px;width:100%;border-radius:10px;box-sizing:border-box;.title:where(.svelte-1dqovpw) {font-size:14px;}}.data:where(.svelte-1dqovpw) {display:flex;flex-direction:column;.desc:where(.svelte-1dqovpw) {font-size:11px;color:var(--liiga-text-secondary);}.value:where(.svelte-1dqovpw) {font-size:14px;}}\n\n        @media (min-width: 768px) {&.horizontal {flex-direction:row;gap:30px;padding-bottom:0;.fade:where(.svelte-1dqovpw) {display:none;}.player-image:where(.svelte-1dqovpw) {width:250px;}.name:where(.svelte-1dqovpw) {text-align:start;}}\n        }}"
 };
 function Player($$anchor, $$props) {
 	push($$props, true);
-	append_styles$1($$anchor, $$css$4);
-	let playerId = prop($$props, "playerId", 7, "23595916"), theme = prop($$props, "theme", 7, "auto"), layout = prop($$props, "layout", 7, "vertical");
+	append_styles$1($$anchor, $$css$5);
+	let playerId = prop($$props, "playerId", 7, null), theme = prop($$props, "theme", 7, "auto"), layout = prop($$props, "layout", 7, "vertical");
 	let player = /* @__PURE__ */ state(null);
 	let latestTeam = /* @__PURE__ */ user_derived(() => {
 		if (!get(player) || !get(player).teams) return null;
@@ -5546,7 +5477,6 @@ function Player($$anchor, $$props) {
 		const url = `https://www.liiga.fi/api/v2/players/info/${playerId()}`;
 		const request = await fetch(url);
 		set(player, await request.json(), true);
-		console.log(snapshot(get(player)));
 	});
 	let latestSeasonStats = /* @__PURE__ */ user_derived(() => {
 		if (!get(player)?.historical) return null;
@@ -5628,7 +5558,7 @@ function Player($$anchor, $$props) {
 		get playerId() {
 			return playerId();
 		},
-		set playerId($$value = "23595916") {
+		set playerId($$value = null) {
 			playerId($$value);
 			flushSync();
 		},
@@ -5647,11 +5577,11 @@ function Player($$anchor, $$props) {
 			flushSync();
 		}
 	};
-	var fragment = comment();
-	var node = first_child(fragment);
+	var div = root_5$3();
+	var node = child(div);
 	var consequent_3 = ($$anchor) => {
-		var div = root_3$3();
-		var div_1 = child(div);
+		var fragment = root_3$3();
+		var div_1 = first_child(fragment);
 		var img = child(div_1);
 		var img_1 = sibling(img, 2);
 		next(2);
@@ -5740,12 +5670,12 @@ function Player($$anchor, $$props) {
 		reset(div_2);
 		var node_10 = sibling(div_2, 2);
 		var consequent_1 = ($$anchor) => {
-			var div_17 = root_1$4();
+			var div_17 = root_1$5();
 			var p_8 = child(div_17);
 			var text_8 = child(p_8, true);
 			reset(p_8);
 			each(sibling(p_8, 2), 17, () => statLabels, index, ($$anchor, stat) => {
-				var div_18 = root$4();
+				var div_18 = root$5();
 				var p_9 = child(div_18);
 				var text_9 = child(p_9, true);
 				reset(p_9);
@@ -5769,9 +5699,9 @@ function Player($$anchor, $$props) {
 		});
 		var node_12 = sibling(node_10, 2);
 		var consequent_2 = ($$anchor) => {
-			var div_19 = root_2$4();
+			var div_19 = root_2$5();
 			each(sibling(child(div_19), 2), 17, () => statLabels, index, ($$anchor, stat) => {
-				var div_20 = root$4();
+				var div_20 = root$5();
 				var p_11 = child(div_20);
 				var text_11 = child(p_11, true);
 				reset(p_11);
@@ -5793,9 +5723,7 @@ function Player($$anchor, $$props) {
 			if (get(careerStats)) $$render(consequent_2);
 		});
 		reset(section);
-		reset(div);
 		template_effect(($0, $1) => {
-			set_class(div, 1, `liiga player widget card ${theme() ?? ""} ${layout() ?? ""}`, "svelte-1dqovpw");
 			set_attribute(img, "src", get(latestTeam)?.imageUrl || "");
 			set_attribute(img, "alt", `${get(player).firstName} ${get(player).lastName}`);
 			set_attribute(img_1, "src", $0);
@@ -5808,12 +5736,18 @@ function Player($$anchor, $$props) {
 			set_text(text_6, get(latestTeam).position);
 			set_text(text_7, get(player).handedness);
 		}, [() => getTeamLogo(get(latestTeam).slug), () => getDate(get(player).dateOfBirth)]);
-		append($$anchor, div);
+		append($$anchor, fragment);
+	};
+	var alternate_1 = ($$anchor) => {
+		append($$anchor, root_4$3());
 	};
 	if_block(node, ($$render) => {
 		if (get(player) != null) $$render(consequent_3);
+		else $$render(alternate_1, -1);
 	});
-	append($$anchor, fragment);
+	reset(div);
+	template_effect(() => set_class(div, 1, `liiga player widget card ${theme() ?? ""} ${layout() ?? ""}`, "svelte-1dqovpw"));
+	append($$anchor, div);
 	return pop($$exports);
 }
 customElements.define("liiga-player-widget", create_custom_element(Player, {
@@ -5899,21 +5833,21 @@ var PLAYER_STAT_COLUMNS = {
 };
 //#endregion
 //#region src/widgets/PlayerStandingsList.svelte
-var root$3 = /* @__PURE__ */ from_html(`<th> </th>`);
-var root_1$3 = /* @__PURE__ */ from_html(`<td class="left flex"><img class="player-image svelte-1lzm3xr"/> <span> </span></td>`);
-var root_2$3 = /* @__PURE__ */ from_html(`<td class="left"> </td>`);
+var root$4 = /* @__PURE__ */ from_html(`<th> </th>`);
+var root_1$4 = /* @__PURE__ */ from_html(`<td class="left flex"><img class="player-image svelte-1lzm3xr"/> <span> </span></td>`);
+var root_2$4 = /* @__PURE__ */ from_html(`<td class="left"> </td>`);
 var root_3$2 = /* @__PURE__ */ from_html(`<td> </td>`);
 var root_4$2 = /* @__PURE__ */ from_html(`<tr><td></td><!><td class="left"> </td><!></tr>`);
 var root_5$2 = /* @__PURE__ */ from_html(`<table class="card"><thead><tr><th>Sija</th><th class="left">Nimi</th><th class="left">Seura</th><!></tr></thead><tbody></tbody></table>`);
-var root_6 = /* @__PURE__ */ from_html(`<div><!></div>`);
-var $$css$3 = {
+var root_6$1 = /* @__PURE__ */ from_html(`<div><!></div>`);
+var $$css$4 = {
 	hash: "svelte-1lzm3xr",
 	code: ".liiga.player-standings-list.widget.svelte-1lzm3xr {.player-image:where(.svelte-1lzm3xr) {width:50px;height:30px;object-fit:cover;object-position:center top;}}"
 };
 function PlayerStandingsList($$anchor, $$props) {
 	push($$props, true);
-	append_styles$1($$anchor, $$css$3);
-	let season = prop($$props, "season", 7, "2026"), series = prop($$props, "series", 7, "runkosarja"), team = prop($$props, "team", 7, "jyp"), dataType = prop($$props, "dataType", 7, "basicStats"), limit = prop($$props, "limit", 7, 100), columns = prop($$props, "columns", 7, "games, goals, assists, points, penaltyMinutes"), defaultSort = prop($$props, "defaultSort", 7, "points"), showImages = prop($$props, "showImages", 7, false), theme = prop($$props, "theme", 7, "auto"), highlightPlayer = prop($$props, "highlightPlayer", 7, null), link = prop($$props, "link", 7, "none");
+	append_styles$1($$anchor, $$css$4);
+	let season = prop($$props, "season", 7, "2026"), series = prop($$props, "series", 7, "runkosarja"), team = prop($$props, "team", 7, null), dataType = prop($$props, "dataType", 7, "basicStats"), limit = prop($$props, "limit", 7, 100), columns = prop($$props, "columns", 7, "games, goals, assists, points, penaltyMinutes"), defaultSort = prop($$props, "defaultSort", 7, "points"), showImages = prop($$props, "showImages", 7, false), theme = prop($$props, "theme", 7, "auto"), highlightPlayer = prop($$props, "highlightPlayer", 7, null), link = prop($$props, "link", 7, "none");
 	let players = /* @__PURE__ */ state(null);
 	const { sort, sortBy, compare } = createSorter("points");
 	user_effect(() => {
@@ -5949,7 +5883,7 @@ function PlayerStandingsList($$anchor, $$props) {
 		get team() {
 			return team();
 		},
-		set team($$value = "jyp") {
+		set team($$value = null) {
 			team($$value);
 			flushSync();
 		},
@@ -6010,14 +5944,14 @@ function PlayerStandingsList($$anchor, $$props) {
 			flushSync();
 		}
 	};
-	var div = root_6();
+	var div = root_6$1();
 	var node = child(div);
 	var consequent_2 = ($$anchor) => {
 		var table = root_5$2();
 		var thead = child(table);
 		var tr = child(thead);
 		each(sibling(child(tr), 3), 17, () => get(visibleColumns), index, ($$anchor, column) => {
-			var th = root$3();
+			var th = root$4();
 			let classes;
 			var text = child(th, true);
 			reset(th);
@@ -6042,7 +5976,7 @@ function PlayerStandingsList($$anchor, $$props) {
 				td.textContent = `${i + 1}.`;
 				var node_3 = sibling(td);
 				var consequent = ($$anchor) => {
-					var td_1 = root_1$3();
+					var td_1 = root_1$4();
 					var img = child(td_1);
 					var span = sibling(img, 2);
 					var text_1 = child(span);
@@ -6056,7 +5990,7 @@ function PlayerStandingsList($$anchor, $$props) {
 					append($$anchor, td_1);
 				};
 				var alternate = ($$anchor) => {
-					var td_2 = root_2$3();
+					var td_2 = root_2$4();
 					var text_2 = child(td_2);
 					reset(td_2);
 					template_effect(() => set_text(text_2, `${get(player).firstName ?? ""} ${get(player).lastName ?? ""}`));
@@ -6183,20 +6117,21 @@ function get_zoom(element) {
 }
 //#endregion
 //#region src/widgets/PlayerStandingsTabs.svelte
-var root$2 = /* @__PURE__ */ from_html(`<button> </button>`);
-var root_1$2 = /* @__PURE__ */ from_html(`<span class="stat svelte-z7oerj"><strong> </strong> <small class="svelte-z7oerj"> </small></span>`);
-var root_2$2 = /* @__PURE__ */ from_html(`<div class="stats svelte-z7oerj"></div>`);
-var root_3$1 = /* @__PURE__ */ from_html(`<div class="score svelte-z7oerj"><p class="value"> </p></div>`);
-var root_4$1 = /* @__PURE__ */ from_html(`<button><div class="player-image svelte-z7oerj"><img class="svelte-z7oerj"/></div> <div class="details svelte-z7oerj"><p class="name svelte-z7oerj"><span class="number svelte-z7oerj"> </span> </p> <!></div> <!></button>`);
-var root_5$1 = /* @__PURE__ */ from_html(`<div><div class="tabs card svelte-z7oerj"></div> <!></div>`);
-var $$css$2 = {
+var root$3 = /* @__PURE__ */ from_html(`<button> </button>`);
+var root_1$3 = /* @__PURE__ */ from_html(`<span class="number svelte-z7oerj"> </span>`);
+var root_2$3 = /* @__PURE__ */ from_html(`<span class="stat svelte-z7oerj"><strong> </strong> <small class="svelte-z7oerj"> </small></span>`);
+var root_3$1 = /* @__PURE__ */ from_html(`<div class="stats svelte-z7oerj"></div>`);
+var root_4$1 = /* @__PURE__ */ from_html(`<div class="score svelte-z7oerj"><p class="value"> </p></div>`);
+var root_5$1 = /* @__PURE__ */ from_html(`<button><div class="player-image svelte-z7oerj"><img class="svelte-z7oerj"/></div> <div class="details svelte-z7oerj"><p class="name svelte-z7oerj"><!> </p> <!></div> <!></button>`);
+var root_6 = /* @__PURE__ */ from_html(`<div><div class="tabs card svelte-z7oerj"></div> <!></div>`);
+var $$css$3 = {
 	hash: "svelte-z7oerj",
-	code: ".liiga.player-standings-tabs.widget.svelte-z7oerj {flex-direction:column;background-color:transparent;padding:0;.tabs:where(.svelte-z7oerj) {display:flex;align-items:start;width:100%;gap:10px;box-sizing:border-box;button:where(.svelte-z7oerj) {background-color:var(--liiga-foreground);outline:none;border:none;border-radius:5px;padding:8px 15px;font-size:13px;transition:background-color 0.2s ease;&.active {background-color:var(--liiga-accent);color:var(--liiga-text-on-accent);}}}.player:where(.svelte-z7oerj) {display:flex;align-items:center;width:100%;background-color:var(--liiga-bg);border-radius:10px;box-sizing:border-box;overflow:hidden;outline:none;padding:0;}.player-image:where(.svelte-z7oerj) {width:130px;height:120px;margin-right:20px;img:where(.svelte-z7oerj) {width:100%;height:140%;object-fit:cover;object-position:center top;}}.details:where(.svelte-z7oerj) {flex-grow:1;margin-right:30px;.name:where(.svelte-z7oerj) {font-size:20px;font-weight:500;display:flex;flex-direction:column;align-items:start;margin:0;.number:where(.svelte-z7oerj) {color:var(--liiga-text-secondary);font-weight:400;font-size:15px;}}.stats:where(.svelte-z7oerj) {display:flex;flex-wrap:wrap;gap:12px;margin-top:6px;.stat:where(.svelte-z7oerj) {display:flex;flex-direction:column;align-items:start;small:where(.svelte-z7oerj) {font-size:11px;opacity:0.7;text-transform:capitalize;}}}}.score:where(.svelte-z7oerj) {height:120px;width:100px;background-color:var(--liiga-accent);color:var(--liiga-text-on-accent);display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:25px;}}"
+	code: ".liiga.player-standings-tabs.widget.svelte-z7oerj {flex-direction:column;background-color:transparent;padding:0;.tabs:where(.svelte-z7oerj) {display:flex;align-items:start;width:100%;gap:10px;box-sizing:border-box;button:where(.svelte-z7oerj) {background-color:var(--liiga-foreground);outline:none;border:none;border-radius:5px;padding:8px 15px;font-size:13px;transition:background-color 0.2s ease;&.active {background-color:var(--liiga-accent);color:var(--liiga-text-on-accent);}}}.player:where(.svelte-z7oerj) {display:flex;align-items:center;width:100%;background-color:var(--liiga-bg);border-radius:10px;box-sizing:border-box;overflow:hidden;outline:none;padding:0;}.player-image:where(.svelte-z7oerj) {width:130px;height:120px;margin-right:20px;&:has(img:where(.svelte-z7oerj):not([src])) {background:var(--liiga-foreground);border-radius:5px;margin:10px;height:100px;margin-right:20px;width:120px;}img:where(.svelte-z7oerj) {width:100%;height:140%;object-fit:cover;object-position:center top;&:not([src]) {display:none;}}}.details:where(.svelte-z7oerj) {flex-grow:1;margin-right:30px;.name:where(.svelte-z7oerj) {font-size:20px;font-weight:500;display:flex;flex-direction:column;align-items:start;margin:0;.number:where(.svelte-z7oerj) {color:var(--liiga-text-secondary);font-weight:400;font-size:15px;}}.stats:where(.svelte-z7oerj) {display:flex;flex-wrap:wrap;gap:12px;margin-top:6px;.stat:where(.svelte-z7oerj) {display:flex;flex-direction:column;align-items:start;small:where(.svelte-z7oerj) {font-size:11px;opacity:0.7;text-transform:capitalize;}}}}.score:where(.svelte-z7oerj) {height:120px;width:100px;background-color:var(--liiga-accent);color:var(--liiga-text-on-accent);display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:25px;}}"
 };
 function PlayerStandingsTabs($$anchor, $$props) {
 	push($$props, true);
-	append_styles$1($$anchor, $$css$2);
-	let season = prop($$props, "season", 7, "2026"), series = prop($$props, "series", 7, "runkosarja"), team = prop($$props, "team", 7, "jyp"), dataType = prop($$props, "dataType", 7, "basicStats"), limit = prop($$props, "limit", 7, 5), columns = prop($$props, "columns", 7, "points, goals, assists, games, penaltyMinutes"), defaultSort = prop($$props, "defaultSort", 7, "points"), theme = prop($$props, "theme", 7, "auto"), showScoreCard = prop($$props, "showScoreCard", 7, true), showAllStats = prop($$props, "showAllStats", 7, true), link = prop($$props, "link", 7, "none");
+	append_styles$1($$anchor, $$css$3);
+	let season = prop($$props, "season", 7, "2026"), series = prop($$props, "series", 7, "runkosarja"), team = prop($$props, "team", 7, null), dataType = prop($$props, "dataType", 7, "basicStats"), limit = prop($$props, "limit", 7, 5), columns = prop($$props, "columns", 7, "points, goals, assists, games, penaltyMinutes"), defaultSort = prop($$props, "defaultSort", 7, "points"), theme = prop($$props, "theme", 7, "auto"), showScoreCard = prop($$props, "showScoreCard", 7, true), showAllStats = prop($$props, "showAllStats", 7, true), link = prop($$props, "link", 7, "none");
 	let players = /* @__PURE__ */ state(null);
 	const { sort, sortBy, compare } = createSorter("points");
 	user_effect(() => {
@@ -6235,7 +6170,7 @@ function PlayerStandingsTabs($$anchor, $$props) {
 		get team() {
 			return team();
 		},
-		set team($$value = "jyp") {
+		set team($$value = null) {
 			team($$value);
 			flushSync();
 		},
@@ -6296,10 +6231,10 @@ function PlayerStandingsTabs($$anchor, $$props) {
 			flushSync();
 		}
 	};
-	var div = root_5$1();
+	var div = root_6();
 	var div_1 = child(div);
 	each(div_1, 21, () => get(visibleColumns), index, ($$anchor, column) => {
-		var button = root$2();
+		var button = root$3();
 		let classes;
 		var text = child(button, true);
 		reset(button);
@@ -6312,29 +6247,37 @@ function PlayerStandingsTabs($$anchor, $$props) {
 	});
 	reset(div_1);
 	var node = sibling(div_1, 2);
-	var consequent_3 = ($$anchor) => {
+	var consequent_4 = ($$anchor) => {
 		var fragment = comment();
 		each(first_child(fragment), 25, () => get(sortedPlayers), (player) => player.playerId, ($$anchor, player) => {
-			var button_1 = root_4$1();
+			var button_1 = root_5$1();
 			let classes_1;
 			var div_2 = child(button_1);
 			var img = child(div_2);
 			reset(div_2);
 			var div_3 = sibling(div_2, 2);
 			var p = child(div_3);
-			var span = child(p);
-			var text_1 = child(span);
-			reset(span);
-			var text_2 = sibling(span);
+			var node_2 = child(p);
+			var consequent = ($$anchor) => {
+				var span = root_1$3();
+				var text_1 = child(span);
+				reset(span);
+				template_effect(() => set_text(text_1, `#${get(player).jersey ?? ""}`));
+				append($$anchor, span);
+			};
+			if_block(node_2, ($$render) => {
+				if (get(player).jersey) $$render(consequent);
+			});
+			var text_2 = sibling(node_2);
 			reset(p);
-			var node_2 = sibling(p, 2);
-			var consequent_1 = ($$anchor) => {
-				var div_4 = root_2$2();
+			var node_3 = sibling(p, 2);
+			var consequent_2 = ($$anchor) => {
+				var div_4 = root_3$1();
 				each(div_4, 21, () => get(visibleColumns), index, ($$anchor, column) => {
 					var fragment_1 = comment();
-					var node_3 = first_child(fragment_1);
-					var consequent = ($$anchor) => {
-						var span_1 = root_1$2();
+					var node_4 = first_child(fragment_1);
+					var consequent_1 = ($$anchor) => {
+						var span_1 = root_2$3();
 						var strong = child(span_1);
 						var text_3 = child(strong, true);
 						reset(strong);
@@ -6348,21 +6291,21 @@ function PlayerStandingsTabs($$anchor, $$props) {
 						}, [() => getColumnValue(get(player), get(column))]);
 						append($$anchor, span_1);
 					};
-					if_block(node_3, ($$render) => {
-						if (!(showScoreCard() && get(column) === sort.attribute)) $$render(consequent);
+					if_block(node_4, ($$render) => {
+						if (!(showScoreCard() && get(column) === sort.attribute)) $$render(consequent_1);
 					});
 					append($$anchor, fragment_1);
 				});
 				reset(div_4);
 				append($$anchor, div_4);
 			};
-			if_block(node_2, ($$render) => {
-				if (showAllStats()) $$render(consequent_1);
+			if_block(node_3, ($$render) => {
+				if (showAllStats()) $$render(consequent_2);
 			});
 			reset(div_3);
-			var node_4 = sibling(div_3, 2);
-			var consequent_2 = ($$anchor) => {
-				var div_5 = root_3$1();
+			var node_5 = sibling(div_3, 2);
+			var consequent_3 = ($$anchor) => {
+				var div_5 = root_4$1();
 				var p_1 = child(div_5);
 				var text_5 = child(p_1, true);
 				reset(p_1);
@@ -6370,16 +6313,16 @@ function PlayerStandingsTabs($$anchor, $$props) {
 				template_effect(($0) => set_text(text_5, $0), [() => getColumnValue(get(player), sort.attribute)]);
 				append($$anchor, div_5);
 			};
-			if_block(node_4, ($$render) => {
-				if (showScoreCard()) $$render(consequent_2);
+			if_block(node_5, ($$render) => {
+				if (showScoreCard()) $$render(consequent_3);
 			});
 			reset(button_1);
 			template_effect(() => {
 				classes_1 = set_class(button_1, 1, "player card svelte-z7oerj", null, classes_1, { clickable: link() != "none" });
 				set_attribute(img, "src", get(player).pictureUrl);
 				set_attribute(img, "alt", `${get(player).firstName} ${get(player).lastName}}`);
-				set_text(text_1, `#${get(player).jersey ?? ""}`);
-				set_text(text_2, ` ${get(player).firstName ?? ""} ${get(player).lastName ?? ""}`);
+				set_text(text_2, ` ${get(player).firstName ?? ""}
+                        ${get(player).lastName ?? ""}`);
 			});
 			delegated("click", button_1, () => handleClick(get(player).playerId));
 			animation(button_1, () => flip, () => ({ duration: 400 }));
@@ -6388,7 +6331,7 @@ function PlayerStandingsTabs($$anchor, $$props) {
 		append($$anchor, fragment);
 	};
 	if_block(node, ($$render) => {
-		if (get(players)) $$render(consequent_3);
+		if (get(players)) $$render(consequent_4);
 	});
 	reset(div);
 	template_effect(() => set_class(div, 1, `liiga player-standings-tabs widget table ${theme() ?? ""}`, "svelte-z7oerj"));
@@ -6411,17 +6354,17 @@ customElements.define("liiga-player-standings-tabs-widget", create_custom_elemen
 }, [], []));
 //#endregion
 //#region src/widgets/TeamStandings.svelte
-var root$1 = /* @__PURE__ */ from_html(`<tr><td class="flex"><img class="logo svelte-8l6w1z"/> <span> </span></td><td> </td><td> </td><td> </td><td> </td><td> </td></tr>`);
-var root_1$1 = /* @__PURE__ */ from_html(`<table class="card"><thead><tr><th class="left"></th><th title="Ottelut">O</th><th title="Voitot">V</th><th title="Tasapelit">T</th><th title="Häviöt">H</th><th title="Pisteet">P</th></tr></thead><tbody></tbody></table>`);
-var root_2$1 = /* @__PURE__ */ from_html(`<div><!></div>`);
-var $$css$1 = {
+var root$2 = /* @__PURE__ */ from_html(`<tr><td class="flex"><img class="logo svelte-8l6w1z"/> <span> </span></td><td> </td><td> </td><td> </td><td> </td><td> </td></tr>`);
+var root_1$2 = /* @__PURE__ */ from_html(`<table class="card"><thead><tr><th class="left"></th><th title="Ottelut">O</th><th title="Voitot">V</th><th title="Tasapelit">T</th><th title="Häviöt">H</th><th title="Pisteet">P</th></tr></thead><tbody></tbody></table>`);
+var root_2$2 = /* @__PURE__ */ from_html(`<div><!></div>`);
+var $$css$2 = {
 	hash: "svelte-8l6w1z",
 	code: ".liiga.team-standings.widget.svelte-8l6w1z {.logo:where(.svelte-8l6w1z) {width:30px;height:30px;}}"
 };
 function TeamStandings($$anchor, $$props) {
 	push($$props, true);
-	append_styles$1($$anchor, $$css$1);
-	let season = prop($$props, "season", 7, "2026"), theme = prop($$props, "theme", 7, "auto"), highlightTeam = prop($$props, "highlightTeam", 7, "jyp"), link = prop($$props, "link", 7, "none");
+	append_styles$1($$anchor, $$css$2);
+	let season = prop($$props, "season", 7, "2026"), theme = prop($$props, "theme", 7, "auto"), highlightTeam = prop($$props, "highlightTeam", 7, null), link = prop($$props, "link", 7, "none");
 	let data = /* @__PURE__ */ state(null);
 	const { sort, sortBy, compare } = createSorter("points");
 	let sortedTeams = /* @__PURE__ */ user_derived(() => {
@@ -6445,7 +6388,6 @@ function TeamStandings($$anchor, $$props) {
 		const lastPart = parts[1];
 		if (link() === "homepage") {
 			const url = teams.find((team) => team.id === lastPart)?.homepage;
-			console.log(url);
 			if (url) window.open(url, "_blank", "noopener,noreferrer");
 		}
 		if (link() === "liiga") {
@@ -6472,7 +6414,7 @@ function TeamStandings($$anchor, $$props) {
 		get highlightTeam() {
 			return highlightTeam();
 		},
-		set highlightTeam($$value = "jyp") {
+		set highlightTeam($$value = null) {
 			highlightTeam($$value);
 			flushSync();
 		},
@@ -6484,10 +6426,10 @@ function TeamStandings($$anchor, $$props) {
 			flushSync();
 		}
 	};
-	var div = root_2$1();
+	var div = root_2$2();
 	var node = child(div);
 	var consequent = ($$anchor) => {
-		var table = root_1$1();
+		var table = root_1$2();
 		var thead = child(table);
 		var tr = child(thead);
 		var th = sibling(child(tr));
@@ -6504,7 +6446,7 @@ function TeamStandings($$anchor, $$props) {
 		reset(thead);
 		var tbody = sibling(thead);
 		each(tbody, 21, () => get(sortedTeams), index, ($$anchor, team) => {
-			var tr_1 = root$1();
+			var tr_1 = root$2();
 			let classes_5;
 			var td = child(tr_1);
 			var img = child(td);
@@ -6578,24 +6520,23 @@ customElements.define("liiga-team-standings-widget", create_custom_element(TeamS
 }, [], []));
 //#endregion
 //#region src/widgets/MatchList.svelte
-var root = /* @__PURE__ */ from_html(`<div class="month svelte-f2n30u"> </div>`);
-var root_1 = /* @__PURE__ */ from_html(`<a class="tickets svelte-f2n30u" target="_blank"> </a>`);
-var root_2 = /* @__PURE__ */ from_html(`<div class="gradient svelte-f2n30u"></div>`);
+var root$1 = /* @__PURE__ */ from_html(`<div class="month svelte-f2n30u"> </div>`);
+var root_1$1 = /* @__PURE__ */ from_html(`<a class="tickets svelte-f2n30u" target="_blank"> </a>`);
+var root_2$1 = /* @__PURE__ */ from_html(`<div class="gradient svelte-f2n30u"></div>`);
 var root_3 = /* @__PURE__ */ from_html(`<div class="match svelte-f2n30u"><p class="date svelte-f2n30u"> </p> <p class="home name svelte-f2n30u"> </p> <img class="logo svelte-f2n30u"/> <p class="time svelte-f2n30u"> </p> <img class="logo svelte-f2n30u"/> <p class="away name svelte-f2n30u"> </p> <!> <!></div>`);
 var root_4 = /* @__PURE__ */ from_html(`<!> <div class="matches card svelte-f2n30u"></div>`, 1);
 var root_5 = /* @__PURE__ */ from_html(`<div><!></div>`);
-var $$css = {
+var $$css$1 = {
 	hash: "svelte-f2n30u",
 	code: ".liiga.match-list.widget.svelte-f2n30u {flex-direction:column;padding:0;.matches:where(.svelte-f2n30u) {border-radius:10px;overflow:hidden;padding:0;.match:where(.svelte-f2n30u) {display:grid;grid-template-columns:80px minmax(140px, 1fr) 40px 60px 40px minmax(140px, 1fr);width:100%;align-items:center;padding:10px;box-sizing:border-box;gap:10px;position:relative;.date:where(.svelte-f2n30u) {justify-self:start;}.time:where(.svelte-f2n30u) {justify-self:center;}.logo:where(.svelte-f2n30u) {width:40px;height:40px;justify-self:center;}&:nth-child(even) {background:var(--liiga-foreground);}.home.name:where(.svelte-f2n30u) {justify-self:end;}.away.name:where(.svelte-f2n30u) {justify-self:start;}.date:where(.svelte-f2n30u),\n                .time:where(.svelte-f2n30u),\n                .logo:where(.svelte-f2n30u),\n                .name:where(.svelte-f2n30u),\n                .tickets:where(.svelte-f2n30u) {z-index:2;}.gradient:where(.svelte-f2n30u) {position:absolute;left:0;right:0;top:0;bottom:0;}}}&.separateMonths {background-color:transparent;.matches:where(.svelte-f2n30u) {background-color:var(--liiga-bg);}.month:where(.svelte-f2n30u) {display:flex;width:100%;margin-top:10px;}}&.ticketButton {.match:where(.svelte-f2n30u) {grid-template-columns:80px minmax(140px, 1fr) 40px 60px 40px minmax(140px, 1fr) 100px;}.tickets:where(.svelte-f2n30u) {color:var(--liiga-text);text-decoration:none;cursor:pointer;text-align:end;}}}"
 };
 function MatchList($$anchor, $$props) {
 	push($$props, true);
-	append_styles$1($$anchor, $$css);
+	append_styles$1($$anchor, $$css$1);
 	let matches = /* @__PURE__ */ state(null);
 	let season = prop($$props, "season", 7, 2027), tournament = prop($$props, "tournament", 7, "runkosarja"), team = prop($$props, "team", 7, null), venue = prop($$props, "venue", 7, null), separateMonths = prop($$props, "separateMonths", 7, true), ticketButton = prop($$props, "ticketButton", 7, true), limit = prop($$props, "limit", 7, 0), gradient = prop($$props, "gradient", 7, false), theme = prop($$props, "theme", 7, "auto");
 	onMount(async () => {
 		set(matches, await fetchJson(`/schedule?tournament=${tournament()}&season=${season()}`), true);
-		console.log(snapshot(get(matches)));
 	});
 	let filteredMatches = /* @__PURE__ */ user_derived(() => {
 		if (!get(matches)) return [];
@@ -6719,7 +6660,7 @@ function MatchList($$anchor, $$props) {
 			var fragment_1 = root_4();
 			var node_2 = first_child(fragment_1);
 			var consequent = ($$anchor) => {
-				var div_1 = root();
+				var div_1 = root$1();
 				var text = child(div_1, true);
 				reset(div_1);
 				template_effect(() => set_text(text, get(group).month));
@@ -6747,7 +6688,7 @@ function MatchList($$anchor, $$props) {
 				reset(p_3);
 				var node_3 = sibling(p_3, 2);
 				var consequent_1 = ($$anchor) => {
-					var a = root_1();
+					var a = root_1$1();
 					var text_5 = child(a, true);
 					reset(a);
 					template_effect(() => {
@@ -6761,7 +6702,7 @@ function MatchList($$anchor, $$props) {
 				});
 				var node_4 = sibling(node_3, 2);
 				var consequent_2 = ($$anchor) => {
-					var div_4 = root_2();
+					var div_4 = root_2$1();
 					template_effect(($0) => set_style(div_4, $0), [() => get(match) ? `background: ${getBackground(get(match))}` : ""]);
 					append($$anchor, div_4);
 				};
@@ -6812,5 +6753,146 @@ customElements.define("liiga-match-list-widget", create_custom_element(MatchList
 	limit: {},
 	gradient: {},
 	theme: {}
+}, [], []));
+//#endregion
+//#region src/widgets/LastGameResults.svelte
+var root = /* @__PURE__ */ from_html(`<div class="separator svelte-2dhjwh"></div>`);
+var root_1 = /* @__PURE__ */ from_html(`<div class="match svelte-2dhjwh"><img class="logo svelte-2dhjwh"/> <div class="details svelte-2dhjwh"><p class="date svelte-2dhjwh"> </p> <p class="score svelte-2dhjwh"> </p></div> <img class="logo svelte-2dhjwh"/></div> <!>`, 1);
+var root_2 = /* @__PURE__ */ from_html(`<div></div>`);
+var $$css = {
+	hash: "svelte-2dhjwh",
+	code: ".liiga.last-game-results.widget.svelte-2dhjwh {&.vertical {flex-direction:column;.separator:where(.svelte-2dhjwh) {width:100%;height:1px;background-color:var(--liiga-border);}}&.horizontal {flex-direction:row;gap:20px;.separator:where(.svelte-2dhjwh) {width:1px;min-height:100%;align-self:stretch;background-color:var(--liiga-border);}}.match:where(.svelte-2dhjwh) {display:flex;gap:10px;align-items:center;.details:where(.svelte-2dhjwh) {display:flex;flex-direction:column;align-items:center;.date:where(.svelte-2dhjwh) {font-size:14px;color:var(--liiga-text-secondary);}.score:where(.svelte-2dhjwh) {font-size:25px;}}.logo:where(.svelte-2dhjwh) {width:50px;}}}"
+};
+function LastGameResults($$anchor, $$props) {
+	push($$props, true);
+	append_styles$1($$anchor, $$css);
+	let data = /* @__PURE__ */ state(null);
+	let season = prop($$props, "season", 7, 2026), tournament = prop($$props, "tournament", 7, "runkosarja"), theme = prop($$props, "theme", 7, "auto"), layout = prop($$props, "layout", 7, "horizontal"), limit = prop($$props, "limit", 7, 5), team = prop($$props, "team", 7, "jyp"), venue = prop($$props, "venue", 7, null);
+	onMount(async () => {
+		set(data, await fetchJson(`/schedule?tournament=${tournament()}&season=${season()}`), true);
+	});
+	let filteredMatches = /* @__PURE__ */ user_derived(() => {
+		if (!get(data)) return [];
+		const now = Date.now();
+		const teamSlug = team().toLowerCase();
+		return get(data).filter((match) => new Date(match.start).getTime() < now).filter((match) => {
+			const isHome = match.homeTeamId.endsWith(`:${teamSlug}`);
+			const isAway = match.awayTeamId.endsWith(`:${teamSlug}`);
+			switch (venue()) {
+				case "home": return isHome;
+				case "away": return isAway;
+				default: return isHome || isAway;
+			}
+		}).sort((a, b) => new Date(b.start) - new Date(a.start)).slice(0, limit());
+	});
+	var $$exports = {
+		get season() {
+			return season();
+		},
+		set season($$value = 2026) {
+			season($$value);
+			flushSync();
+		},
+		get tournament() {
+			return tournament();
+		},
+		set tournament($$value = "runkosarja") {
+			tournament($$value);
+			flushSync();
+		},
+		get theme() {
+			return theme();
+		},
+		set theme($$value = "auto") {
+			theme($$value);
+			flushSync();
+		},
+		get layout() {
+			return layout();
+		},
+		set layout($$value = "horizontal") {
+			layout($$value);
+			flushSync();
+		},
+		get limit() {
+			return limit();
+		},
+		set limit($$value = 5) {
+			limit($$value);
+			flushSync();
+		},
+		get team() {
+			return team();
+		},
+		set team($$value = "jyp") {
+			team($$value);
+			flushSync();
+		},
+		get venue() {
+			return venue();
+		},
+		set venue($$value = null) {
+			venue($$value);
+			flushSync();
+		}
+	};
+	var fragment = comment();
+	var node = first_child(fragment);
+	var consequent_1 = ($$anchor) => {
+		var div = root_2();
+		each(div, 21, () => get(filteredMatches), index, ($$anchor, match, i) => {
+			var fragment_1 = root_1();
+			var div_1 = first_child(fragment_1);
+			var img = child(div_1);
+			var div_2 = sibling(img, 2);
+			var p = child(div_2);
+			var text = child(p);
+			reset(p);
+			var p_1 = sibling(p, 2);
+			var text_1 = child(p_1);
+			reset(p_1);
+			reset(div_2);
+			var img_1 = sibling(div_2, 2);
+			reset(div_1);
+			var node_1 = sibling(div_1, 2);
+			var consequent = ($$anchor) => {
+				append($$anchor, root());
+			};
+			if_block(node_1, ($$render) => {
+				if (i < get(filteredMatches).length - 1) $$render(consequent);
+			});
+			template_effect(($0, $1, $2, $3) => {
+				set_attribute(img, "src", $0);
+				set_attribute(img, "alt", get(match).homeTeamName);
+				set_text(text, `${$1 ?? ""} ${$2 ?? ""}`);
+				set_text(text_1, `${get(match).homeTeamGoals ?? ""} - ${get(match).awayTeamGoals ?? ""}`);
+				set_attribute(img_1, "src", $3);
+				set_attribute(img_1, "alt", get(match).awayTeamName);
+			}, [
+				() => getTeamLogo(get(match).homeTeamId),
+				() => formatDate(get(match).start),
+				() => formatTime(get(match).start),
+				() => getTeamLogo(get(match).awayTeamId)
+			]);
+			append($$anchor, fragment_1);
+		});
+		reset(div);
+		template_effect(() => set_class(div, 1, `liiga last-game-results widget card ${theme() ?? ""} ${layout() ?? ""}`, "svelte-2dhjwh"));
+		append($$anchor, div);
+	};
+	if_block(node, ($$render) => {
+		if (get(data) != null) $$render(consequent_1);
+	});
+	append($$anchor, fragment);
+	return pop($$exports);
+}
+customElements.define("liiga-last-game-results-widget", create_custom_element(LastGameResults, {
+	season: {},
+	tournament: {},
+	theme: {},
+	layout: {},
+	limit: {},
+	team: {},
+	venue: {}
 }, [], []));
 //#endregion

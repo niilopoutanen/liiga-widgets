@@ -10,7 +10,7 @@
   },
   "scripts": {
     "build": "vite build",
-    "preview": "vite dev"
+    "preview": "vite dev --config vite.preview.config.js"
   },
   "repository": {
     "type": "git",

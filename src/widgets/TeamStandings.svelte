@@ -44,7 +44,6 @@
 
         if (link === "homepage") {
             const url = teams.find((team) => team.id === lastPart)?.homepage;
-            console.log(url);
             if (url) {
                 window.open(url, "_blank", "noopener,noreferrer");
             }

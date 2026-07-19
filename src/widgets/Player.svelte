@@ -34,7 +34,6 @@
         const url = `https://www.liiga.fi/api/v2/players/info/${playerId}`;
         const request = await fetch(url);
         player = await request.json();
-        console.log($state.snapshot(player));
     });
 
     let latestSeasonStats = $derived.by(() => {
