@@ -1,0 +1,109 @@
+:root {
+    --liiga-accent: #1b7eff;
+    --liiga-bg: light-dark(#ffffff, #232323);
+    --liiga-foreground: light-dark(#f0f0f0, #2c2c2c);
+    --liiga-text: light-dark(#000000, #ffffff);
+    --liiga-text-secondary: light-dark(#525252, #959595);
+    --liiga-text-inverse: light-dark(#ffffff, #000000);
+    --liiga-text-on-accent: #FFFFFF;
+    --liiga-border: light-dark(#d0d0d0, #454545);
+    --liiga-card-radius: 10px;
+}
+
+.liiga {
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Open Sans', sans-serif;
+
+    p {
+        margin: 0;
+    }
+}
+
+.liiga.widget {
+    color: var(--liiga-text);
+    position: relative;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    gap: 10px;
+
+    &.light {
+        color-scheme: light;
+    }
+
+    &.dark {
+        color-scheme: dark;
+    }
+
+    .card,
+    &.card {
+        background: var(--liiga-bg);
+        border-radius: var(--liiga-card-radius);
+        padding: 10px;
+        border: 1px solid var(--liiga-border);
+    }
+}
+
+.liiga.widget.table {
+    table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+    }
+
+    thead {
+        padding: 10px 110px;
+    }
+
+    th,
+    td {
+        padding: 8px;
+        text-align: center;
+        align-items: center;
+
+        span {
+            vertical-align: middle;
+        }
+
+        &.left {
+            text-align: left;
+        }
+    }
+
+    td.flex {
+        display: flex;
+        gap: 10px;
+    }
+
+    th.active {
+        background: var(--liiga-foreground);
+        border-radius: 5px;
+    }
+
+    tr {
+        border-radius: 5px;
+
+        &:nth-child(even) td {
+            background: var(--liiga-foreground);
+        }
+
+        td:first-child {
+            border-radius: 5px 0 0 5px;
+        }
+
+        td:last-child {
+            border-radius: 0 5px 5px 0;
+        }
+
+        &.highlight td {
+            background-color: var(--liiga-accent);
+            color: var(--liiga-text-on-accent);
+        }
+    }
+}
+
+
+.liiga .clickable {
+    cursor: pointer;
+}

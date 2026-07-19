@@ -1,0 +1,90 @@
+:root {
+  --liiga-accent: #1b7eff;
+  --liiga-bg: light-dark(#ffffff, #232323);
+  --liiga-foreground: light-dark(#f0f0f0, #2c2c2c);
+  --liiga-text: light-dark(#000000, #ffffff);
+  --liiga-text-secondary: light-dark(#525252, #959595);
+  --liiga-text-inverse: light-dark(#ffffff, #000000);
+  --liiga-text-on-accent: #FFFFFF;
+  --liiga-border: light-dark(#d0d0d0, #454545);
+  --liiga-card-radius: 10px;
+}
+
+.liiga {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Open Sans", sans-serif;
+}
+.liiga p {
+  margin: 0;
+}
+
+.liiga.widget {
+  color: var(--liiga-text);
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+.liiga.widget.light {
+  color-scheme: light;
+}
+.liiga.widget.dark {
+  color-scheme: dark;
+}
+.liiga.widget .card, .liiga.widget.card {
+  background: var(--liiga-bg);
+  border-radius: var(--liiga-card-radius);
+  padding: 10px;
+  border: 1px solid var(--liiga-border);
+}
+
+.liiga.widget.table table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+.liiga.widget.table thead {
+  padding: 10px 110px;
+}
+.liiga.widget.table th,
+.liiga.widget.table td {
+  padding: 8px;
+  text-align: center;
+  align-items: center;
+}
+.liiga.widget.table th span,
+.liiga.widget.table td span {
+  vertical-align: middle;
+}
+.liiga.widget.table th.left,
+.liiga.widget.table td.left {
+  text-align: left;
+}
+.liiga.widget.table td.flex {
+  display: flex;
+  gap: 10px;
+}
+.liiga.widget.table th.active {
+  background: var(--liiga-foreground);
+  border-radius: 5px;
+}
+.liiga.widget.table tr {
+  border-radius: 5px;
+}
+.liiga.widget.table tr:nth-child(even) td {
+  background: var(--liiga-foreground);
+}
+.liiga.widget.table tr td:first-child {
+  border-radius: 5px 0 0 5px;
+}
+.liiga.widget.table tr td:last-child {
+  border-radius: 0 5px 5px 0;
+}
+.liiga.widget.table tr.highlight td {
+  background-color: var(--liiga-accent);
+  color: var(--liiga-text-on-accent);
+}
+
+.liiga .clickable {
+  cursor: pointer;
+}/*$vite$:1*/

@@ -1,0 +1,24 @@
+{
+  "name": "liiga-widgets",
+  "private": true,
+  "version": "0.0.0",
+  "description": "A collection of browser-native web components for displaying Liiga stats and data.",
+  "type": "module",
+  "author": {
+    "name": "Niilo Poutanen",
+    "email": "niilo@poutanen.dev"
+  },
+  "scripts": {
+    "build": "vite build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/niilopoutanen/liiga-widgets.git"
+  },
+  "devDependencies": {
+    "@sveltejs/vite-plugin-svelte": "^7.1.2",
+    "sass-embedded": "^1.100.0",
+    "svelte": "^5.56.4",
+    "vite": "^8.1.1"
+  }
+}
