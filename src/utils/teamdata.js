@@ -17,16 +17,15 @@ export const teams = [
   { id: "tappara", color: "#FF6400", homepage: "https://tappara.fi" },
   { id: "tps", color: "#000000", homepage: "https://hc.tps.fi" },
 ];
+import { parseId } from "./parser.js";
+
 const logos = import.meta.glob("../assets/logos/*.svg", {
   eager: true,
   import: "default"
 });
 
 export function getTeamLogo(id) {
-  if (id.includes(":")) {
-    const parts = id.split(":");
-    id = parts[1];
-  }
+  id = parseId(id);
   return logos[`../assets/logos/${id}.svg`] ?? null;
 }
 
@@ -34,11 +33,7 @@ export function getTeam(id) {
   return teams.find(team => team.id === id) ?? null;
 }
 
-export function parseId(teamId) {
-  return String(teamId).split(":").pop();
-}
-
 export function getTeamColor(teamId) {
-  const id = teamId.split(":")[1];
+  const id = parseId(teamId);
   return teams.find((team) => team.id === id)?.color ?? "#888";
 }

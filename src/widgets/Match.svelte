@@ -9,24 +9,14 @@
     import { onMount } from "svelte";
     import "../global.scss";
     import { getTeamLogo, getTeamColor } from "../utils/teamdata";
+    import { fetchJson } from "../utils/api.js";
+    import { formatDate, formatTime } from "../utils/parser.js";
 
     let data = $state(null);
     let { matchId = 2701274, season = 2027, theme = "auto", gradient = true } = $props();
 
     onMount(async () => {
-        const url = `https://www.liiga.fi/api/v2/games/${season}/${matchId}`;
-        const request = await fetch(url);
-        data = await request.json();
-    });
-
-    function getDate(dateStr) {
-        let date = new Date(dateStr);
-        return `${String(date.getDate())}.${String(date.getMonth() + 1)}.${date.getFullYear()}`;
-    }
-
-    function getTime(dateStr) {
-        let date = new Date(dateStr);
-        return `${String(date.getHours()).padStart(2, "0")}:${String(date.getMinutes()).padStart(2, "0")}`;
+        data = await fetchJson(`/games/${season}/${matchId}`);
     }
 
     function getBackground(game) {
@@ -63,8 +53,8 @@
             </div>
         {:else}
             <div class="date">
-                <p class="hours">{getDate(data.game.start)}</p>
-                <p class="minutes">{getTime(data.game.start)}</p>
+                <p class="hours">{formatDate(data.game.start)}</p>
+                <p class="minutes">{formatTime(data.game.start)}</p>
             </div>
         {/if}
         <div class="away">

@@ -8,7 +8,10 @@
 <script>
     import { onMount } from "svelte";
     import "../global.scss";
-    import { getTeamLogo, parseId, getTeamColor } from "../utils/teamdata";
+    import { getTeamLogo, getTeamColor } from "../utils/teamdata";
+    import { fetchJson } from "../utils/api.js";
+    import { formatDate, formatTime, parseId } from "../utils/parser.js";
+    import { FINNISH_MONTHS, MATCH_LIST_LABELS } from "../utils/labels.js";
 
     let matches = $state(null);
     let {
@@ -25,9 +28,7 @@
     } = $props();
 
     onMount(async () => {
-        const url = `https://www.liiga.fi/api/v2/schedule?tournament=${tournament}&season=${season}`;
-        const request = await fetch(url);
-        matches = await request.json();
+        matches = await fetchJson(`/schedule?tournament=${tournament}&season=${season}`);
         console.log($state.snapshot(matches));
     });
 
@@ -59,18 +60,6 @@
         return filtered;
     });
 
-    function getDate(dateStr) {
-        let date = new Date(dateStr);
-        return `${String(date.getDate()).padStart(2, "0")}.${String(date.getMonth() + 1).padStart(2, "0")}.${date.getFullYear()}`;
-    }
-
-    function getTime(dateStr) {
-        let date = new Date(dateStr);
-        return `${String(date.getHours()).padStart(2, "0")}:${String(date.getMinutes()).padStart(2, "0")}`;
-    }
-
-    const months = ["Tammikuu", "Helmikuu", "Maaliskuu", "Huhtikuu", "Toukokuu", "Kesäkuu", "Heinäkuu", "Elokuu", "Syyskuu", "Lokakuu", "Marraskuu", "Joulukuu"];
-
     let groupedMatches = $derived.by(() => {
         if (!separateMonths) {
             return [
@@ -86,7 +75,7 @@
         for (const match of filteredMatches) {
             const date = new Date(match.start);
             const key = `${date.getFullYear()}-${date.getMonth()}`;
-            const label = `${months[date.getMonth()]} ${date.getFullYear()}`;
+            const label = `${FINNISH_MONTHS[date.getMonth()]} ${date.getFullYear()}`;
 
             let group = groups.at(-1);
 
@@ -130,15 +119,15 @@
             <div class="matches card">
                 {#each group.matches as match (match.id)}
                     <div class="match">
-                        <p class="date">{getDate(match.start)}</p>
+                        <p class="date">{formatDate(match.start, { padDay: true })}</p>
                         <p class="home name">{match.homeTeamName}</p>
                         <img class="logo" src={getTeamLogo(match.homeTeamId)} alt={match.homeTeamName} />
-                        <p class="time">{getTime(match.start)}</p>
+                        <p class="time">{formatTime(match.start)}</p>
                         <img class="logo" src={getTeamLogo(match.awayTeamId)} alt={match.awayTeamName} />
                         <p class="away name">{match.awayTeamName}</p>
 
                         {#if ticketButton && match.buyTicketsUrl != null}
-                            <a class="tickets" href={match.buyTicketsUrl} target="_blank">Osta liput</a>
+                            <a class="tickets" href={match.buyTicketsUrl} target="_blank">{MATCH_LIST_LABELS.tickets}</a>
                         {/if}
 
                         {#if gradient}

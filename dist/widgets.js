@@ -3414,24 +3414,6 @@ function from_html(content, flags) {
 	};
 }
 /**
-* Don't mark this as side-effect-free, hydration needs to walk all nodes
-* @param {any} value
-*/
-function text(value = "") {
-	if (!hydrating) {
-		var t = create_text(value + "");
-		assign_nodes(t, t);
-		return t;
-	}
-	var node = hydrate_node;
-	if (node.nodeType !== 3) {
-		node.before(node = create_text());
-		set_hydrate_node(node);
-	} else merge_text_nodes(node);
-	assign_nodes(node, node);
-	return node;
-}
-/**
 * @returns {TemplateNode | DocumentFragment}
 */
 function comment() {
@@ -5387,6 +5369,21 @@ var tps_default = "data:image/svg+xml,%3csvg%20width='256'%20height='256'%20view
 //#region src/assets/logos/ässät.svg
 var ässät_default = "data:image/svg+xml,%3csvg%20width='256'%20height='256'%20viewBox='0%200%20256%20256'%20fill='none'%20xmlns='http://www.w3.org/2000/svg'%3e%3cpath%20d='M128%200C57.3081%200%200%2057.3078%200%20128C0%20198.693%2057.3081%20256%20128%20256C198.693%20256%20256%20198.693%20256%20128C256%2057.3078%20198.693%200%20128%200Z'%20fill='white'/%3e%3cpath%20d='M201.969%2095.4108C175.214%2070.0858%20128%2032.7227%20128%2032.7227C128%2032.7227%2080.8843%2069.9929%2054.0311%2095.4108C31.6666%20116.581%2028.1316%20147.292%2044.7669%20170.098C61.4018%20192.904%2091.9375%20196.935%20112.971%20179.102C114.361%20177.923%20115.666%20176.671%20116.902%20175.367C115.198%20181.788%20112.165%20187.871%20107.762%20193.13C92.4432%20211.425%2059.506%20217.476%2039.3396%20187.32C27.9952%20170.356%2021.3324%20149.955%2021.3324%20128C21.3324%2069.0894%2069.085%2021.3323%20128%2021.3323C186.916%2021.3323%20234.668%2069.0918%20234.668%20128C234.668%20149.955%20228.005%20170.356%20216.661%20187.32C196.494%20217.476%20163.557%20211.425%20148.238%20193.13C143.835%20187.871%20140.802%20181.788%20139.098%20175.367C140.335%20176.671%20141.639%20177.923%20143.03%20179.102C164.063%20196.935%20194.599%20192.904%20211.233%20170.098C227.869%20147.292%20224.334%20116.581%20201.969%2095.4108ZM128%205.33326C60.2533%205.33326%205.33336%2060.2532%205.33336%20128C5.33336%20195.747%2060.2533%20250.667%20128%20250.667C195.748%20250.667%20250.667%20195.747%20250.667%20128C250.667%2060.2532%20195.748%205.33326%20128%205.33326Z'%20fill='black'/%3e%3c/svg%3e";
 //#endregion
+//#region src/utils/parser.js
+function formatDate(value, { padDay = false } = {}) {
+	const date = new Date(value);
+	const day = String(date.getDate());
+	return `${padDay ? day.padStart(2, "0") : day}.${date.getMonth() + 1}.${date.getFullYear()}`;
+}
+function formatTime(value) {
+	const date = new Date(value);
+	return `${String(date.getHours()).padStart(2, "0")}:${String(date.getMinutes()).padStart(2, "0")}`;
+}
+function parseId(value) {
+	if (value == null) return null;
+	return String(value).split(":").at(-1);
+}
+//#endregion
 //#region src/utils/teamdata.js
 var teams = [
 	{
@@ -5495,173 +5492,13 @@ var logos = /* #__PURE__ */ Object.assign({
 	"../assets/logos/ässät.svg": ässät_default
 });
 function getTeamLogo(id) {
-	if (id.includes(":")) id = id.split(":")[1];
+	id = parseId(id);
 	return logos[`../assets/logos/${id}.svg`] ?? null;
 }
-function parseId(teamId) {
-	return String(teamId).split(":").pop();
-}
 function getTeamColor(teamId) {
-	const id = teamId.split(":")[1];
+	const id = parseId(teamId);
 	return teams.find((team) => team.id === id)?.color ?? "#888";
 }
-//#endregion
-//#region src/widgets/Match.svelte
-var root$5 = /* @__PURE__ */ from_html(` <!>`, 1);
-var root_1$5 = /* @__PURE__ */ from_html(`<div class="score svelte-vjge6i"><p class="goals svelte-vjge6i"> </p> <p class="details svelte-vjge6i"></p></div>`);
-var root_2$5 = /* @__PURE__ */ from_html(`<div class="date svelte-vjge6i"><p class="hours svelte-vjge6i"> </p> <p class="minutes svelte-vjge6i"> </p></div>`);
-var root_3$4 = /* @__PURE__ */ from_html(`<div class="gradient svelte-vjge6i"></div>`);
-var root_4$3 = /* @__PURE__ */ from_html(`<div class="home svelte-vjge6i"><img class="logo svelte-vjge6i"/></div> <!> <div class="away svelte-vjge6i"><img class="logo svelte-vjge6i"/></div> <!>`, 1);
-var root_5$3 = /* @__PURE__ */ from_html(`<div><!></div>`);
-var $$css$5 = {
-	hash: "svelte-vjge6i",
-	code: ".liiga.match.widget.svelte-vjge6i {overflow:hidden;p:where(.svelte-vjge6i) {margin:0;}.logo:where(.svelte-vjge6i) {width:50px;height:50px;}.home:where(.svelte-vjge6i),\n        .away:where(.svelte-vjge6i){display:flex;align-items:center;justify-content:center;}.date:where(.svelte-vjge6i) {display:flex;flex-direction:column;align-items:center;.hours:where(.svelte-vjge6i) {font-size:20px;font-weight:bold;}.minutes:where(.svelte-vjge6i) {font-weight:400;}}.score:where(.svelte-vjge6i) {display:flex;flex-direction:column;align-items:center;justify-content:center;.goals:where(.svelte-vjge6i) {font-size:1.5rem;font-weight:bold;}.details:where(.svelte-vjge6i) {font-size:0.8rem;color:var(--liiga-text-secondary);}}.gradient:where(.svelte-vjge6i) {position:absolute;left:0;right:0;top:0;bottom:0;}}"
-};
-function Match($$anchor, $$props) {
-	push($$props, true);
-	append_styles$1($$anchor, $$css$5);
-	let data = /* @__PURE__ */ state(null);
-	let matchId = prop($$props, "matchId", 7, 2701274), season = prop($$props, "season", 7, 2027), theme = prop($$props, "theme", 7, "auto"), gradient = prop($$props, "gradient", 7, true);
-	onMount(async () => {
-		const url = `https://www.liiga.fi/api/v2/games/${season()}/${matchId()}`;
-		const request = await fetch(url);
-		set(data, await request.json(), true);
-	});
-	function getDate(dateStr) {
-		let date = new Date(dateStr);
-		return `${String(date.getDate())}.${String(date.getMonth() + 1)}.${date.getFullYear()}`;
-	}
-	function getTime(dateStr) {
-		let date = new Date(dateStr);
-		return `${String(date.getHours()).padStart(2, "0")}:${String(date.getMinutes()).padStart(2, "0")}`;
-	}
-	function getBackground(game) {
-		return `
-        linear-gradient(
-            90deg,
-            ${getTeamColor(game.homeTeam.teamId)}22 0%,
-            transparent 30%,
-            transparent 70%,
-            ${getTeamColor(game.awayTeam.teamId)}22 100%
-        )`;
-	}
-	var $$exports = {
-		get matchId() {
-			return matchId();
-		},
-		set matchId($$value = 2701274) {
-			matchId($$value);
-			flushSync();
-		},
-		get season() {
-			return season();
-		},
-		set season($$value = 2027) {
-			season($$value);
-			flushSync();
-		},
-		get theme() {
-			return theme();
-		},
-		set theme($$value = "auto") {
-			theme($$value);
-			flushSync();
-		},
-		get gradient() {
-			return gradient();
-		},
-		set gradient($$value = true) {
-			gradient($$value);
-			flushSync();
-		}
-	};
-	var div = root_5$3();
-	var node = child(div);
-	var consequent_3 = ($$anchor) => {
-		var fragment = root_4$3();
-		var div_1 = first_child(fragment);
-		var img = child(div_1);
-		reset(div_1);
-		var node_1 = sibling(div_1, 2);
-		var consequent_1 = ($$anchor) => {
-			var div_2 = root_1$5();
-			var p = child(div_2);
-			var text$1 = child(p);
-			reset(p);
-			var p_1 = sibling(p, 2);
-			each(p_1, 21, () => get(data).game.periods.filter((period) => period.homeTeamGoals !== 0 || period.awayTeamGoals !== 0), index, ($$anchor, period, index) => {
-				next();
-				var fragment_1 = root$5();
-				var text_1 = first_child(fragment_1);
-				var node_2 = sibling(text_1);
-				var consequent = ($$anchor) => {
-					append($$anchor, text(","));
-				};
-				var d = /* @__PURE__ */ user_derived(() => index < get(data).game.periods.filter((period) => period.homeTeamGoals !== 0 || period.awayTeamGoals !== 0).length - 1);
-				if_block(node_2, ($$render) => {
-					if (get(d)) $$render(consequent);
-				});
-				template_effect(() => set_text(text_1, `${get(period).homeTeamGoals ?? ""} - ${get(period).awayTeamGoals ?? ""} `));
-				append($$anchor, fragment_1);
-			});
-			reset(p_1);
-			reset(div_2);
-			template_effect(() => set_text(text$1, `${get(data).game.homeTeam.goals ?? ""} - ${get(data).game.awayTeam.goals ?? ""}`));
-			append($$anchor, div_2);
-		};
-		var alternate = ($$anchor) => {
-			var div_3 = root_2$5();
-			var p_2 = child(div_3);
-			var text_3 = child(p_2, true);
-			reset(p_2);
-			var p_3 = sibling(p_2, 2);
-			var text_4 = child(p_3, true);
-			reset(p_3);
-			reset(div_3);
-			template_effect(($0, $1) => {
-				set_text(text_3, $0);
-				set_text(text_4, $1);
-			}, [() => getDate(get(data).game.start), () => getTime(get(data).game.start)]);
-			append($$anchor, div_3);
-		};
-		if_block(node_1, ($$render) => {
-			if (get(data).game.ended) $$render(consequent_1);
-			else $$render(alternate, -1);
-		});
-		var div_4 = sibling(node_1, 2);
-		var img_1 = child(div_4);
-		reset(div_4);
-		var node_3 = sibling(div_4, 2);
-		var consequent_2 = ($$anchor) => {
-			var div_5 = root_3$4();
-			template_effect(($0) => set_style(div_5, $0), [() => get(data) ? `background: ${getBackground(get(data).game)}` : ""]);
-			append($$anchor, div_5);
-		};
-		if_block(node_3, ($$render) => {
-			if (gradient()) $$render(consequent_2);
-		});
-		template_effect(($0, $1) => {
-			set_attribute(img, "src", $0);
-			set_attribute(img, "alt", get(data).game.homeTeam.teamName);
-			set_attribute(img_1, "src", $1);
-			set_attribute(img_1, "alt", get(data).game.awayTeam.teamName);
-		}, [() => getTeamLogo(get(data).game.homeTeam.teamId), () => getTeamLogo(get(data).game.awayTeam.teamId)]);
-		append($$anchor, fragment);
-	};
-	if_block(node, ($$render) => {
-		if (get(data) != null) $$render(consequent_3);
-	});
-	reset(div);
-	template_effect(() => set_class(div, 1, `liiga match widget card ${theme() ?? ""}`, "svelte-vjge6i"));
-	append($$anchor, div);
-	return pop($$exports);
-}
-customElements.define("liiga-match-widget", create_custom_element(Match, {
-	matchId: {},
-	season: {},
-	theme: {},
-	gradient: {}
-}, [], []));
 //#endregion
 //#region src/assets/icons/ruler.svg?raw
 var ruler_default = "<svg width=\"113\" height=\"51\" viewBox=\"0 0 113 51\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n<path d=\"M112.949 12.4216C112.949 4.24828 108.655 0 100.388 0H12.4678C4.2021 0 0 4.24828 0 12.4216V37.6342C0 45.8075 4.24828 50.0557 12.5139 50.0557H100.435C108.7 50.0557 112.949 45.8075 112.949 37.6342V12.4216ZM105.468 13.7607V36.295C105.468 40.451 103.252 42.6213 99.2345 42.6213H13.6222C9.69714 42.6213 7.43448 40.451 7.43448 36.295V13.7607C7.43448 9.60482 9.69714 7.43448 13.6683 7.43448H99.2799C103.252 7.43448 105.468 9.60482 105.468 13.7607ZM17.6395 4.84857H13.8993V29.1838C13.8993 30.2458 14.7305 31.0309 15.7925 31.0309C16.9008 31.0309 17.6395 30.1997 17.6395 29.1376V4.84857ZM25.8129 4.84857H22.0725V21.0567C22.0725 22.1649 22.9038 22.9038 23.9197 22.9038C25.0741 22.9038 25.8129 22.1187 25.8129 21.0105V4.84857ZM33.94 4.84857H30.1535V21.0567C30.1535 22.1649 31.0309 22.9038 32.0468 22.9038C33.155 22.9038 33.94 22.1187 33.94 21.0105V4.84857ZM42.021 4.84857H38.2806V21.0567C38.2806 22.1649 39.1118 22.9038 40.1739 22.9038C41.2821 22.9038 42.021 22.1187 42.021 21.0105V4.84857ZM50.1943 4.84857H46.454V21.0567C46.454 22.1649 47.2851 22.9038 48.301 22.9038C49.4554 22.9038 50.1943 22.1187 50.1943 21.0105V4.84857ZM58.3676 4.84857H54.6273V29.1838C54.6273 30.2458 55.4585 31.0309 56.4744 31.0309C57.6288 31.0309 58.3676 30.1997 58.3676 29.1376V4.84857ZM66.4947 4.84857H62.7544V21.0567C62.7544 22.1649 63.5856 22.9038 64.6014 22.9038C65.7097 22.9038 66.4947 22.1187 66.4947 21.0105V4.84857ZM74.6218 4.84857H70.8816V21.0567C70.8816 22.1649 71.7127 22.9038 72.7748 22.9038C73.883 22.9038 74.6218 22.1187 74.6218 21.0105V4.84857ZM82.749 4.84857H79.0087V21.0567C79.0087 22.1649 79.8398 22.9038 80.8557 22.9038C82.0102 22.9038 82.749 22.1187 82.749 21.0105V4.84857ZM90.9223 4.84857H87.182V21.0567C87.182 22.1649 88.0132 22.9038 89.029 22.9038C90.1373 22.9038 90.9223 22.1187 90.9223 21.0105V4.84857ZM99.0491 4.84857H95.3089V29.1838C95.3089 30.2458 96.1402 31.0309 97.2022 31.0309C98.3105 31.0309 99.0491 30.1997 99.0491 29.1376V4.84857Z\" fill=\"white\"/>\n</svg>\n";
@@ -6010,6 +5847,57 @@ function createSorter(defaultAttribute = "points", defaultDescending = true) {
 	};
 }
 //#endregion
+//#region src/utils/api.js
+var API_BASE_URL = "https://www.liiga.fi/api/v2";
+async function fetchJson(path, options) {
+	const response = await fetch(`${API_BASE_URL}${path}`, options);
+	if (!response.ok) throw new Error(`Liiga API request failed: ${response.status} ${response.statusText}`);
+	return response.json();
+}
+//#endregion
+//#region src/utils/labels.js
+var FINNISH_MONTHS = [
+	"Tammikuu",
+	"Helmikuu",
+	"Maaliskuu",
+	"Huhtikuu",
+	"Toukokuu",
+	"Kesäkuu",
+	"Heinäkuu",
+	"Elokuu",
+	"Syyskuu",
+	"Lokakuu",
+	"Marraskuu",
+	"Joulukuu"
+];
+var MATCH_LIST_LABELS = { tickets: "Osta liput" };
+var PLAYER_STAT_COLUMNS = {
+	games: {
+		title: "Ottelut",
+		label: "O"
+	},
+	goals: {
+		title: "Maalit",
+		label: "M"
+	},
+	assists: {
+		title: "Syötöt",
+		label: "S"
+	},
+	points: {
+		title: "Pisteet",
+		label: "P"
+	},
+	penaltyMinutes: {
+		title: "Jäähyminuutit",
+		label: "R"
+	},
+	plusMinus: {
+		title: "+/-",
+		label: "+/-"
+	}
+};
+//#endregion
 //#region src/widgets/PlayerStandingsList.svelte
 var root$3 = /* @__PURE__ */ from_html(`<th> </th>`);
 var root_1$3 = /* @__PURE__ */ from_html(`<td class="left flex"><img class="player-image svelte-1lzm3xr"/> <span> </span></td>`);
@@ -6025,28 +5913,6 @@ var $$css$3 = {
 function PlayerStandingsList($$anchor, $$props) {
 	push($$props, true);
 	append_styles$1($$anchor, $$css$3);
-	const PLAYER_COLUMNS = {
-		games: {
-			title: "Ottelut",
-			label: "O"
-		},
-		goals: {
-			title: "Maalit",
-			label: "M"
-		},
-		assists: {
-			title: "Syötöt",
-			label: "S"
-		},
-		points: {
-			title: "Pisteet",
-			label: "P"
-		},
-		penaltyMinutes: {
-			title: "Rangaistusminuutit",
-			label: "R"
-		}
-	};
 	let season = prop($$props, "season", 7, "2026"), series = prop($$props, "series", 7, "runkosarja"), team = prop($$props, "team", 7, "jyp"), dataType = prop($$props, "dataType", 7, "basicStats"), limit = prop($$props, "limit", 7, 100), columns = prop($$props, "columns", 7, "games, goals, assists, points, penaltyMinutes"), defaultSort = prop($$props, "defaultSort", 7, "points"), showImages = prop($$props, "showImages", 7, false), theme = prop($$props, "theme", 7, "auto"), highlightPlayer = prop($$props, "highlightPlayer", 7, null), link = prop($$props, "link", 7, "none");
 	let players = /* @__PURE__ */ state(null);
 	const { sort, sortBy, compare } = createSorter("points");
@@ -6057,11 +5923,9 @@ function PlayerStandingsList($$anchor, $$props) {
 		if (!get(players)) return [];
 		return [...get(players)].sort(compare);
 	});
-	const visibleColumns = /* @__PURE__ */ user_derived(() => columns().split(",").map((c) => c.trim()).filter((c) => PLAYER_COLUMNS[c]));
+	const visibleColumns = /* @__PURE__ */ user_derived(() => columns().split(",").map((c) => c.trim()).filter((c) => PLAYER_STAT_COLUMNS[c]));
 	onMount(async () => {
-		const url = ` https://www.liiga.fi/api/v2/players/stats/summed/${season()}/${season()}/${series()}/false?team=${team()}&dataType=${dataType()}&splitTeams=true`;
-		const request = await fetch(url);
-		set(players, await request.json(), true);
+		set(players, await fetchJson(`/players/stats/summed/${season()}/${season()}/${series()}/false?team=${team()}&dataType=${dataType()}&splitTeams=true`), true);
 	});
 	function handleClick(playerId) {
 		if (link() === "none") return;
@@ -6158,9 +6022,9 @@ function PlayerStandingsList($$anchor, $$props) {
 			var text = child(th, true);
 			reset(th);
 			template_effect(() => {
-				set_attribute(th, "title", PLAYER_COLUMNS[get(column)].title);
+				set_attribute(th, "title", PLAYER_STAT_COLUMNS[get(column)].title);
 				classes = set_class(th, 1, "", null, classes, { active: sort.attribute === get(column) });
-				set_text(text, PLAYER_COLUMNS[get(column)].label);
+				set_text(text, PLAYER_STAT_COLUMNS[get(column)].label);
 			});
 			delegated("click", th, () => sortBy(get(column)));
 			append($$anchor, th);
@@ -6343,21 +6207,12 @@ function PlayerStandingsTabs($$anchor, $$props) {
 		return [...get(players)].sort(compare).slice(0, limit());
 	});
 	onMount(async () => {
-		const url = ` https://www.liiga.fi/api/v2/players/stats/summed/${season()}/${season()}/${series()}/false?team=${team()}&dataType=${dataType()}&splitTeams=true`;
-		const request = await fetch(url);
-		set(players, await request.json(), true);
+		set(players, await fetchJson(`/players/stats/summed/${season()}/${season()}/${series()}/false?team=${team()}&dataType=${dataType()}&splitTeams=true`), true);
 	});
 	const visibleColumns = /* @__PURE__ */ user_derived(() => columns().split(",").map((c) => c.trim()).filter(Boolean));
 	function getColumnValue(player, column) {
 		return player[column] ?? "-";
 	}
-	const labels = {
-		points: "Pisteet",
-		goals: "Maalit",
-		assists: "Syötöt",
-		games: "Ottelut",
-		penaltyMinutes: "Jäähyminuutit"
-	};
 	function handleClick(playerId) {
 		if (link() === "none") return;
 		if (link() === "liiga") window.open("https://www.liiga.fi/fi/pelaajat/" + playerId, "_blank");
@@ -6450,7 +6305,7 @@ function PlayerStandingsTabs($$anchor, $$props) {
 		reset(button);
 		template_effect(() => {
 			classes = set_class(button, 1, "svelte-z7oerj", null, classes, { active: sort.attribute === get(column) });
-			set_text(text, labels[get(column)]);
+			set_text(text, PLAYER_STAT_COLUMNS[get(column)]?.title ?? get(column));
 		});
 		delegated("click", button, () => sort.attribute = get(column));
 		append($$anchor, button);
@@ -6489,7 +6344,7 @@ function PlayerStandingsTabs($$anchor, $$props) {
 						reset(span_1);
 						template_effect(($0) => {
 							set_text(text_3, $0);
-							set_text(text_4, labels[get(column)]);
+							set_text(text_4, PLAYER_STAT_COLUMNS[get(column)]?.title ?? get(column));
 						}, [() => getColumnValue(get(player), get(column))]);
 						append($$anchor, span_1);
 					};
@@ -6724,7 +6579,7 @@ customElements.define("liiga-team-standings-widget", create_custom_element(TeamS
 //#endregion
 //#region src/widgets/MatchList.svelte
 var root = /* @__PURE__ */ from_html(`<div class="month svelte-f2n30u"> </div>`);
-var root_1 = /* @__PURE__ */ from_html(`<a class="tickets svelte-f2n30u" target="_blank">Osta liput</a>`);
+var root_1 = /* @__PURE__ */ from_html(`<a class="tickets svelte-f2n30u" target="_blank"> </a>`);
 var root_2 = /* @__PURE__ */ from_html(`<div class="gradient svelte-f2n30u"></div>`);
 var root_3 = /* @__PURE__ */ from_html(`<div class="match svelte-f2n30u"><p class="date svelte-f2n30u"> </p> <p class="home name svelte-f2n30u"> </p> <img class="logo svelte-f2n30u"/> <p class="time svelte-f2n30u"> </p> <img class="logo svelte-f2n30u"/> <p class="away name svelte-f2n30u"> </p> <!> <!></div>`);
 var root_4 = /* @__PURE__ */ from_html(`<!> <div class="matches card svelte-f2n30u"></div>`, 1);
@@ -6739,9 +6594,7 @@ function MatchList($$anchor, $$props) {
 	let matches = /* @__PURE__ */ state(null);
 	let season = prop($$props, "season", 7, 2027), tournament = prop($$props, "tournament", 7, "runkosarja"), team = prop($$props, "team", 7, null), venue = prop($$props, "venue", 7, null), separateMonths = prop($$props, "separateMonths", 7, true), ticketButton = prop($$props, "ticketButton", 7, true), limit = prop($$props, "limit", 7, 0), gradient = prop($$props, "gradient", 7, false), theme = prop($$props, "theme", 7, "auto");
 	onMount(async () => {
-		const url = `https://www.liiga.fi/api/v2/schedule?tournament=${tournament()}&season=${season()}`;
-		const request = await fetch(url);
-		set(matches, await request.json(), true);
+		set(matches, await fetchJson(`/schedule?tournament=${tournament()}&season=${season()}`), true);
 		console.log(snapshot(get(matches)));
 	});
 	let filteredMatches = /* @__PURE__ */ user_derived(() => {
@@ -6759,28 +6612,6 @@ function MatchList($$anchor, $$props) {
 		if (limit() > 0) return filtered.slice(0, limit());
 		return filtered;
 	});
-	function getDate(dateStr) {
-		let date = new Date(dateStr);
-		return `${String(date.getDate()).padStart(2, "0")}.${String(date.getMonth() + 1).padStart(2, "0")}.${date.getFullYear()}`;
-	}
-	function getTime(dateStr) {
-		let date = new Date(dateStr);
-		return `${String(date.getHours()).padStart(2, "0")}:${String(date.getMinutes()).padStart(2, "0")}`;
-	}
-	const months = [
-		"Tammikuu",
-		"Helmikuu",
-		"Maaliskuu",
-		"Huhtikuu",
-		"Toukokuu",
-		"Kesäkuu",
-		"Heinäkuu",
-		"Elokuu",
-		"Syyskuu",
-		"Lokakuu",
-		"Marraskuu",
-		"Joulukuu"
-	];
 	let groupedMatches = /* @__PURE__ */ user_derived(() => {
 		if (!separateMonths()) return [{
 			month: null,
@@ -6790,7 +6621,7 @@ function MatchList($$anchor, $$props) {
 		for (const match of get(filteredMatches)) {
 			const date = new Date(match.start);
 			const key = `${date.getFullYear()}-${date.getMonth()}`;
-			const label = `${months[date.getMonth()]} ${date.getFullYear()}`;
+			const label = `${FINNISH_MONTHS[date.getMonth()]} ${date.getFullYear()}`;
 			let group = groups.at(-1);
 			if (!group || group.key !== key) {
 				group = {
@@ -6917,7 +6748,12 @@ function MatchList($$anchor, $$props) {
 				var node_3 = sibling(p_3, 2);
 				var consequent_1 = ($$anchor) => {
 					var a = root_1();
-					template_effect(() => set_attribute(a, "href", get(match).buyTicketsUrl));
+					var text_5 = child(a, true);
+					reset(a);
+					template_effect(() => {
+						set_attribute(a, "href", get(match).buyTicketsUrl);
+						set_text(text_5, MATCH_LIST_LABELS.tickets);
+					});
 					append($$anchor, a);
 				};
 				if_block(node_3, ($$render) => {
@@ -6943,9 +6779,9 @@ function MatchList($$anchor, $$props) {
 					set_attribute(img_1, "alt", get(match).awayTeamName);
 					set_text(text_4, get(match).awayTeamName);
 				}, [
-					() => getDate(get(match).start),
+					() => formatDate(get(match).start, { padDay: true }),
 					() => getTeamLogo(get(match).homeTeamId),
-					() => getTime(get(match).start),
+					() => formatTime(get(match).start),
 					() => getTeamLogo(get(match).awayTeamId)
 				]);
 				append($$anchor, div_3);

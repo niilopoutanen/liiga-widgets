@@ -6,22 +6,16 @@
 />
 
 <script>
-    const PLAYER_COLUMNS = {
-        games: { title: "Ottelut", label: "O" },
-        goals: { title: "Maalit", label: "M" },
-        assists: { title: "Syötöt", label: "S" },
-        points: { title: "Pisteet", label: "P" },
-        penaltyMinutes: { title: "Rangaistusminuutit", label: "R" },
-    };
-
     import { onMount } from "svelte";
     import "../global.scss";
     import { createSorter } from "../utils/sorter.svelte.js";
+    import { fetchJson } from "../utils/api.js";
+    import { PLAYER_STAT_COLUMNS } from "../utils/labels.js";
 
     let {
         season = "2026",
         series = "runkosarja",
-        team = "jyp",
+        team = null,
         dataType = "basicStats",
         limit = 100,
         columns = "games, goals, assists, points, penaltyMinutes",
@@ -50,13 +44,11 @@
         columns
             .split(",")
             .map((c) => c.trim())
-            .filter((c) => PLAYER_COLUMNS[c]),
+            .filter((c) => PLAYER_STAT_COLUMNS[c]),
     );
 
     onMount(async () => {
-        const url = ` https://www.liiga.fi/api/v2/players/stats/summed/${season}/${season}/${series}/false?team=${team}&dataType=${dataType}&splitTeams=true`;
-        const request = await fetch(url);
-        players = await request.json();
+        players = await fetchJson(`/players/stats/summed/${season}/${season}/${series}/false?team=${team}&dataType=${dataType}&splitTeams=true`);
     });
 
     function handleClick(playerId) {
@@ -79,8 +71,8 @@
                     <th class="left">Seura</th>
 
                     {#each visibleColumns as column}
-                        <th title={PLAYER_COLUMNS[column].title} onclick={() => sortBy(column)} class:active={sort.attribute === column}>
-                            {PLAYER_COLUMNS[column].label}
+                        <th title={PLAYER_STAT_COLUMNS[column].title} onclick={() => sortBy(column)} class:active={sort.attribute === column}>
+                            {PLAYER_STAT_COLUMNS[column].label}
                         </th>
                     {/each}
                 </tr>

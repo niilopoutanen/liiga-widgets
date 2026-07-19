@@ -9,13 +9,15 @@
     import { onMount } from "svelte";
     import "../global.scss";
     import { createSorter } from "../utils/sorter.svelte.js";
+    import { fetchJson } from "../utils/api.js";
+    import { PLAYER_STAT_COLUMNS } from "../utils/labels.js";
     import { flip } from "svelte/animate";
     import { bounceInOut } from "svelte/easing";
 
     let {
         season = "2026",
         series = "runkosarja",
-        team = "jyp",
+        team = null,
         dataType = "basicStats",
         limit = 5,
         columns = "points, goals, assists, games, penaltyMinutes",
@@ -41,9 +43,7 @@
     });
 
     onMount(async () => {
-        const url = ` https://www.liiga.fi/api/v2/players/stats/summed/${season}/${season}/${series}/false?team=${team}&dataType=${dataType}&splitTeams=true`;
-        const request = await fetch(url);
-        players = await request.json();
+        players = await fetchJson(`/players/stats/summed/${season}/${season}/${series}/false?team=${team}&dataType=${dataType}&splitTeams=true`);
     });
 
     const visibleColumns = $derived(
@@ -56,14 +56,6 @@
     function getColumnValue(player, column) {
         return player[column] ?? "-";
     }
-
-    const labels = {
-        points: "Pisteet",
-        goals: "Maalit",
-        assists: "Syötöt",
-        games: "Ottelut",
-        penaltyMinutes: "Jäähyminuutit",
-    };
 
     function handleClick(playerId) {
         if (link === "none") return;
@@ -79,7 +71,7 @@
     <div class="tabs card">
         {#each visibleColumns as column}
             <button onclick={() => (sort.attribute = column)} class:active={sort.attribute === column}>
-                {labels[column]}
+                {PLAYER_STAT_COLUMNS[column]?.title ?? column}
             </button>
         {/each}
     </div>
@@ -97,7 +89,7 @@
                                 {#if !(showScoreCard && column === sort.attribute)}
                                     <span class="stat">
                                         <strong>{getColumnValue(player, column)}</strong>
-                                        <small>{labels[column]}</small>
+                                        <small>{PLAYER_STAT_COLUMNS[column]?.title ?? column}</small>
                                     </span>
                                 {/if}
                             {/each}
