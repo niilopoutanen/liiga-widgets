@@ -13,7 +13,7 @@
     import { formatDate, formatTime } from "../utils/parser.js";
 
     let data = $state(null);
-    let { matchId = 2701274, season = 2027, theme = "auto", gradient = true } = $props();
+    let { matchId = null, season = null, theme = "auto", gradient = true } = $props();
 
     onMount(async () => {
         data = await fetchJson(`/games/${season}/${matchId}`);
@@ -64,6 +64,8 @@
         {#if gradient}
             <div class="gradient" style={data ? `background: ${getBackground(data.game)}` : ""}></div>
         {/if}
+    {:else}
+        <p>Set match and season ID in widget params</p>
     {/if}
 </div>
 
@@ -79,7 +81,7 @@
         }
 
         .home,
-        .away{
+        .away {
             display: flex;
             align-items: center;
             justify-content: center;

@@ -82,7 +82,11 @@
                     <img src={player.pictureUrl} alt={`${player.firstName} ${player.lastName}}`} />
                 </div>
                 <div class="details">
-                    <p class="name"><span class="number">#{player.jersey}</span> {player.firstName} {player.lastName}</p>
+                    <p class="name">
+                        {#if player.jersey}<span class="number">#{player.jersey}</span>{/if}
+                        {player.firstName}
+                        {player.lastName}
+                    </p>
                     {#if showAllStats}
                         <div class="stats">
                             {#each visibleColumns as column}
@@ -152,11 +156,24 @@
             width: 130px;
             height: 120px;
             margin-right: 20px;
+
+            &:has(img:not([src])) {
+                background: var(--liiga-foreground);
+                border-radius: 5px;
+                margin: 10px;
+                height: 100px;
+                margin-right: 20px;
+                width: 120px;
+            }
             img {
                 width: 100%;
                 height: 140%;
                 object-fit: cover;
                 object-position: center top;
+
+                &:not([src]) {
+                    display: none;
+                }
             }
         }
 

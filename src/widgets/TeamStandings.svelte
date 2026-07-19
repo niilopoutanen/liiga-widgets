@@ -12,7 +12,7 @@
     import { teams } from "../utils/teamdata.js";
     import { getTeamLogo } from "../utils/teamdata.js";
 
-    let { season = "2026", theme = "auto", highlightTeam = "jyp", link = "none" } = $props();
+    let { season = "2026", theme = "auto", highlightTeam = null, link = "none" } = $props();
     let data = $state(null);
 
     const { sort, sortBy, compare } = createSorter("points");

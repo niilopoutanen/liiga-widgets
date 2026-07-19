@@ -18,7 +18,7 @@
     import stickL from "../assets/icons/stick-l.svg?raw";
     import stickR from "../assets/icons/stick-r.svg?raw";
 
-    let { playerId = "23595916", theme = "auto", layout = "vertical" } = $props();
+    let { playerId = null, theme = "auto", layout = "vertical" } = $props();
 
     let player = $state(null);
     let latestTeam = $derived.by(() => {
@@ -103,8 +103,8 @@
     }
 </script>
 
-{#if player != null}
-    <div class="liiga player widget card {theme} {layout}">
+<div class="liiga player widget card {theme} {layout}">
+    {#if player != null}
         <div class="image">
             <img class="player-image" src={latestTeam?.imageUrl || ""} alt={`${player.firstName} ${player.lastName}`} />
             <img class="team-logo" src={getTeamLogo(latestTeam.slug)} alt="" />
@@ -198,8 +198,10 @@
                 </div>
             {/if}
         </section>
-    </div>
-{/if}
+    {:else}
+        <p>playerId not set in widget params</p>
+    {/if}
+</div>
 
 <style lang="scss">
     .liiga.player.widget {
