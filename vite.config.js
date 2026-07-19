@@ -4,6 +4,7 @@ import { resolve } from 'path';
 
 export default defineConfig({
   plugins: [svelte()],
+  root: "src/preview",
   build: {
     lib: {
       entry: resolve(__dirname, 'src/widgets/index.js'),

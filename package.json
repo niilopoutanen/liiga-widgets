@@ -9,7 +9,8 @@
     "email": "niilo@poutanen.dev"
   },
   "scripts": {
-    "build": "vite build"
+    "build": "vite build",
+    "preview": "vite dev"
   },
   "repository": {
     "type": "git",

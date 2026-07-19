@@ -17,7 +17,7 @@
 
     onMount(async () => {
         data = await fetchJson(`/games/${season}/${matchId}`);
-    }
+    });
 
     function getBackground(game) {
         const home = getTeamColor(game.homeTeam.teamId);
