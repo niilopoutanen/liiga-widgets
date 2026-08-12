@@ -11,6 +11,7 @@ export default defineConfig({
       fileName: "widgets",
       formats: ["es"]
     },
-    minify: false
+    minify: "oxc",
+    cssMinify: false
   }
 });

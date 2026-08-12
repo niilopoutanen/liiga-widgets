@@ -106,6 +106,17 @@
             transparent 100%
         )`;
     }
+
+    function getSafeTicketUrl(value) {
+        if (!value) return null;
+
+        try {
+            const url = new URL(value);
+            return url.protocol === "https:" ? url.href : null;
+        } catch {
+            return null;
+        }
+    }
 </script>
 
 <div class="liiga match-list widget {theme}" class:separateMonths class:ticketButton>
@@ -117,6 +128,7 @@
 
             <div class="matches card">
                 {#each group.matches as match (match.id)}
+                    {@const ticketUrl = getSafeTicketUrl(match.buyTicketsUrl)}
                     <div class="match">
                         <p class="date">{formatDate(match.start, { padDay: true })}</p>
                         <p class="home name">{match.homeTeamName}</p>
@@ -125,8 +137,8 @@
                         <img class="logo" src={getTeamLogo(match.awayTeamId)} alt={match.awayTeamName} />
                         <p class="away name">{match.awayTeamName}</p>
 
-                        {#if ticketButton && match.buyTicketsUrl != null}
-                            <a class="tickets" href={match.buyTicketsUrl} target="_blank">{MATCH_LIST_LABELS.tickets}</a>
+                        {#if ticketButton && ticketUrl}
+                            <a class="tickets" href={ticketUrl} target="_blank" rel="noopener noreferrer">{MATCH_LIST_LABELS.tickets}</a>
                         {/if}
 
                         {#if gradient}

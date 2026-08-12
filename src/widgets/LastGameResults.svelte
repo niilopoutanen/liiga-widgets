@@ -32,13 +32,13 @@
     let filteredMatches = $derived.by(() => {
         if (!data) return [];
 
-        const now = Date.now();
         const teamSlug = team.toLowerCase();
 
         return (
             data
-                // Only matches already played
-                .filter((match) => new Date(match.start).getTime() < now)
+                // Only completed matches. A past start time can also mean a live,
+                // delayed, postponed, or cancelled game.
+                .filter((match) => match.ended === true)
 
                 // Team filter
                 .filter((match) => {

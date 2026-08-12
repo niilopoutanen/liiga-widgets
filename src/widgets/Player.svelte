@@ -97,7 +97,11 @@
     ];
 
     function getDate(dateStr) {
-        let date = new Date(dateStr);
+        if (!dateStr) return "–";
+
+        const date = new Date(dateStr);
+        if (Number.isNaN(date.getTime())) return "–";
+
         return `${String(date.getDate())}.${String(date.getMonth() + 1)}.${date.getFullYear()}`;
     }
 </script>
@@ -105,13 +109,17 @@
 <div class="liiga player widget card {theme} {layout}">
     {#if player != null}
         <div class="image">
-            <img class="player-image" src={latestTeam?.imageUrl || ""} alt={`${player.firstName} ${player.lastName}`} />
-            <img class="team-logo" src={getTeamLogo(latestTeam.slug)} alt="" />
+            {#if latestTeam?.imageUrl}
+                <img class="player-image" src={latestTeam.imageUrl} alt={`${player.firstName ?? ""} ${player.lastName ?? ""}`.trim()} />
+            {/if}
+            {#if latestTeam?.slug && getTeamLogo(latestTeam.slug)}
+                <img class="team-logo" src={getTeamLogo(latestTeam.slug)} alt="" />
+            {/if}
             <div class="fade"></div>
         </div>
 
         <section>
-            <p class="name">#{latestTeam?.jersey} {player.firstName} {player.lastName}</p>
+            <p class="name">{latestTeam?.jersey ? `#${latestTeam.jersey} ` : ""}{player.firstName ?? ""} {player.lastName ?? ""}</p>
 
             <div class="details">
                 <div class="info">
@@ -126,7 +134,7 @@
                     {@html flag}
                     <div class="data">
                         <p class="desc">Syntymäpaikka</p>
-                        <p class="value">{player.birthLocality.name}, {player.birthLocality.country.code}</p>
+                        <p class="value">{player.birthLocality?.name ?? "–"}{player.birthLocality?.country?.code ? `, ${player.birthLocality.country.code}` : ""}</p>
                     </div>
                 </div>
 
@@ -134,7 +142,7 @@
                     {@html flag}
                     <div class="data">
                         <p class="desc">Kansalaisuus</p>
-                        <p class="value">{player.nationality.name}, {player.nationality.code}</p>
+                        <p class="value">{player.nationality?.name ?? "–"}{player.nationality?.code ? `, ${player.nationality.code}` : ""}</p>
                     </div>
                 </div>
 
@@ -142,7 +150,7 @@
                     {@html ruler}
                     <div class="data">
                         <p class="desc">Pituus</p>
-                        <p class="value">{player.height} cm</p>
+                        <p class="value">{player.height != null ? `${player.height} cm` : "–"}</p>
                     </div>
                 </div>
 
@@ -150,14 +158,14 @@
                     {@html weight}
                     <div class="data">
                         <p class="desc">Paino</p>
-                        <p class="value">{player.weight} kg</p>
+                        <p class="value">{player.weight != null ? `${player.weight} kg` : "–"}</p>
                     </div>
                 </div>
                 <div class="info">
                     {@html rink}
                     <div class="data">
                         <p class="desc">Pelipaikka</p>
-                        <p class="value">{latestTeam.position}</p>
+                        <p class="value">{latestTeam?.position ?? "–"}</p>
                     </div>
                 </div>
 
@@ -169,7 +177,7 @@
                     {/if}
                     <div class="data">
                         <p class="desc">Kätisyys</p>
-                        <p class="value">{player.handedness}</p>
+                        <p class="value">{player.handedness ?? "–"}</p>
                     </div>
                 </div>
             </div>
